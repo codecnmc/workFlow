@@ -90,10 +90,17 @@ export default {
       },
     };
   },
-  computed: {},
-  watch: {},
-  created() {},
-  mounted() {},
+  provide() {
+    return {
+      getRoot: () => this.nodeConfig,
+    };
+  },
+  beforeMount() {
+    this.nodeConfig = {
+      error: true,
+      childNode: this.$factory.getStruct(this.$nodeType.开始, null),
+    };
+  },
   methods: {
     // 保存
     saveData() {

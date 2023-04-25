@@ -9,7 +9,7 @@
         <div class="add-node-popover-body">
           <div
             class="add-node-popover-item approver"
-            @click="addType(1)"
+            @click="addType($nodeType.审核人)"
           >
             <div class="item-wrapper">
               <img
@@ -22,7 +22,7 @@
           </div>
           <div
             class="add-node-popover-item notifier"
-            @click="addType(2)"
+            @click="addType($nodeType.抄送人)"
           >
             <div class="item-wrapper">
               <img
@@ -35,7 +35,7 @@
           </div>
           <div
             class="add-node-popover-item notifier"
-            @click="addType(3)"
+            @click="addType($nodeType.办理人)"
           >
             <div class="item-wrapper">
               <img
@@ -48,7 +48,7 @@
           </div>
           <div
             class="add-node-popover-item condition"
-            @click="addType(4)"
+            @click="addType($nodeType.条件分支)"
           >
             <div class="item-wrapper">
               <img
@@ -80,74 +80,19 @@ export default {
   data() {
     return {
       visible: false,
-      parentObj: {},
     };
   },
   methods: {
+    // 新增类型
     addType(type) {
       this.visible = false;
-      let data;
-      switch (type) {
-        case 1:
-          data = {
-            nodeName: "审核人",
-            error: true,
-            type: 1,
-            nodeId: "approvalID",
-            examineMode: "1",
-            nodeUserType: {
-              type: "manager",
-              value: "",
-              valueList: [],
-              valueName: "",
-            },
-            childNode: this.childNodeP,
-          };
-          break;
-        case 2:
-          data = {
-            nodeName: "抄送人",
-            error: true,
-            type: 2,
-            nodeId: "copyID",
-            nodeUserType: {
-              type: "manager",
-              value: "m-1",
-              valueName: "第一级主管",
-              valueList: [],
-            },
-            childNode: this.childNodeP,
-          };
-          break;
-        case 4:
-          data = {
-            nodeName: "路由",
-            type: 4,
-            nodeId: "conditionID",
-            childNode: this.childNodeP,
-            conditionNodes: [
-              {
-                nodeName: "条件1",
-                error: true,
-                type: 3,
-                priorityLevel: 1,
-                conditionList: [],
-                childNode: null,
-              },
-              {
-                nodeName: "默认",
-                error: true,
-                type: 3,
-                priorityLevel: 2,
-                conditionList: [],
-                childNode: null,
-              },
-            ],
-          };
-          this.$parent.setPerson(1, "", data); //添加节点自动弹出弹框
-          break;
+      let data = this.$factory.getStruct(type, this.childNodeP);
+      if (this.$flowConfig.createPopupImmediately) {
+        //添加节点自动弹出弹框
+        type != 4
+          ? this.$parent.setPerson("", "", data, this.tip)
+          : this.$parent.setPerson(1, "", data);
       }
-      type != 4 && this.$parent.setPerson("", "", data, this.tip); //添加节点自动弹出弹框
       this.$emit("update:childNodeP", data);
     },
   },

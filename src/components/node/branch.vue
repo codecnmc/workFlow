@@ -2,7 +2,7 @@
  * @Author: 羊驼
  * @Date: 2023-04-25 10:57:30
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-04-25 11:37:44
+ * @LastEditTime: 2023-04-25 13:41:21
  * @Description: 分支情况
 -->
 <template>
@@ -152,7 +152,6 @@ export default {
           this.conditionStr(this.nodeConfig.conditionNodes[i], i) ==
             "请设置条件" && i != this.nodeConfig.conditionNodes.length - 1;
       }
-
     },
     // 调整条件位置
     arrTransfer(index, type = 1) {
@@ -192,10 +191,7 @@ export default {
               this.nodeConfig.childNode;
           }
         }
-        this.$emit(
-          "input",
-          this.nodeConfig.conditionNodes[0].childNode
-        );
+        this.$emit("input", this.nodeConfig.conditionNodes[0].childNode);
       }
     },
   },
@@ -203,4 +199,8 @@ export default {
 </script>
 
 <style lang="less" scoped>
+// 解决margin也被过渡的问题
+.add-branch {
+  transition: width 0.3s cubic-bezier(0.645, 0.045, 0.355, 1) !important;
+}
 </style>

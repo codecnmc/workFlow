@@ -575,12 +575,15 @@ export default {
     },
     // 获取节点组件
     getComponent() {
+      let nodeType = this.$nodeType;
       switch (this.nodeConfig.type) {
-        case 0:
-        case 1:
-        case 2:
+        case nodeType.开始:
+        case nodeType.审核人:
+        case nodeType.抄送人:
+        case nodeType.办理人:
+        case nodeType.结束:
           return "normal";
-        case 4:
+        case nodeType.条件分支:
           return "branch";
       }
     },
@@ -810,9 +813,8 @@ export default {
       // 区分添加节点后自动出现弹框及点击出现弹框
       if (this.hasFlag) {
         this.nodeConfig.childNode = this.conditionsConfig;
-        this.$emit("update:nodeConfig", this.nodeConfig);
       } else {
-        this.$emit("update:nodeConfig", this.conditionsConfig);
+        this.nodeConfig = this.conditionsConfig;
       }
     },
     //条件字段显示name

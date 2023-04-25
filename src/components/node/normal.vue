@@ -2,26 +2,25 @@
  * @Author: 羊驼
  * @Date: 2023-04-25 10:32:20
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-04-25 11:12:49
+ * @LastEditTime: 2023-04-25 15:45:04
  * @Description: 审核人节点
 -->
 <template>
   <div class="node-wrap">
     <div
       class="node-wrap-box"
-      v-if="nodeConfig.type"
+      v-if="nodeConfig"
       :class="(isTried && nodeConfig.error ? 'active error' : '') "
     >
       <div @click="setPerson">
         <div
           class="title"
-          :style="
-                        'background: rgb(' + [ '87, 106, 149', '230, 162, 60', '72, 128, 255', ][nodeConfig.type] + ');' "
+          :style="`background-color:${$flowConfig.headerColor[nodeConfig.type]}`"
         >
           <span class="editable-title">{{ nodeConfig.nodeName }}</span>
           <i
             class="el-icon-close close"
-            v-if="nodeConfig.type != 0"
+            v-if=" ![$nodeType.开始,$nodeType.结束].includes(nodeConfig.type)"
             @click.stop="delNode()"
           ></i>
         </div>

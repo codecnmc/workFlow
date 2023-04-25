@@ -2,7 +2,7 @@
  * @Author: 羊驼
  * @Date: 2023-04-25 10:34:46
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-04-25 11:32:46
+ * @LastEditTime: 2023-04-25 15:18:22
  * @Description: file content
  */
 import addNode from "../addNode";
@@ -14,7 +14,7 @@ export default {
         event: "input"
     },
     emits: ["openDrawer"],
-    inject: ["setApproverStr", "conditionStr"],
+    inject: ["setApproverStr", "conditionStr", "getRoot"],
     computed: {
         nodeConfig: {
             get() {
@@ -34,12 +34,13 @@ export default {
         if (this.value == undefined) {
             throw Error("无绑定v-model 请绑定")
         }
+        let nodeType = this.$nodeType
         switch (this.nodeConfig.type) {
-            case 1:
-            case 2:
+            case nodeType.审核人:
+            case nodeType.抄送人:
                 this.nodeConfig.error = this.setApproverStr(this.nodeConfig) == "";
                 break;
-            case 4:
+            case nodeType.条件分支:
                 for (var i = 0; i < this.nodeConfig.conditionNodes.length; i++) {
                     this.nodeConfig.conditionNodes[i].error =
                         this.conditionStr(this.nodeConfig.conditionNodes[i], i) ==
@@ -51,7 +52,26 @@ export default {
     methods: {
         // 删除节点
         delNode() {
-            this.nodeConfig.childNode && this.$emit("input", this.nodeConfig.childNode)
+            if (this.nodeConfig.childNode) {
+                this.$emit("input", this.nodeConfig.childNode)
+            } else {
+                // 处理没有下级的情况 需要拿到Root根节点数据向下找 如果他没上级不操作 有上级移除本级
+                let root = this.getRoot()
+                let compareID = this.nodeConfig.nodeId
+                let last = null
+                while (root.childNode) {
+                    if (root.childNode.nodeId == compareID && !last) {
+                        throw Error("不能删除第一个节点")
+                    }
+                    let childID = root.childNode.nodeId
+                    if (childID == compareID) {
+                        root.childNode = null
+                        break;
+                    }
+                    last = root
+                    root = root.childNode
+                }
+            }
         },
         // 打开编辑弹窗
         setPerson(priorityLevel, item, data, tip) {
