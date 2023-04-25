@@ -28,7 +28,6 @@
           <nodeWrap
             v-bind="$attrs"
             v-model="nodeConfig"
-            :dataFields="dataFields"
             :isTried="isTried"
           ></nodeWrap>
         </div>
@@ -65,11 +64,6 @@ export default {
           nodeId: "approvalID",
         },
       },
-      dataFields: [
-        { name: "日期", key: "date", type: "date" },
-        { name: "地址", key: "adress" },
-        { name: "状态", key: "state" },
-      ],
       // 缩放比例
       nowVal: 100,
       // 暂时还不知道作用

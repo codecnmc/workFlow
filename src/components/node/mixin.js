@@ -2,13 +2,17 @@
  * @Author: 羊驼
  * @Date: 2023-04-25 10:34:46
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-04-25 15:18:22
+ * @LastEditTime: 2023-04-25 17:07:09
  * @Description: file content
  */
 import addNode from "../addNode";
 export default {
-    components: { addNode },
-    props: ["isTried", "value", "dataFields"],
+    components: {
+        // 解决递归循环依赖的问题
+        nodeWrap: () => import("@/components/nodeWrap.vue"),
+        addNode,
+    },
+    props: ["isTried", "value"],
     model: {
         prop: "value",
         event: "input"
@@ -59,6 +63,7 @@ export default {
                 let root = this.getRoot()
                 let compareID = this.nodeConfig.nodeId
                 let last = null
+                // 还有一种情况 就是在条件分支下的节点
                 while (root.childNode) {
                     if (root.childNode.nodeId == compareID && !last) {
                         throw Error("不能删除第一个节点")

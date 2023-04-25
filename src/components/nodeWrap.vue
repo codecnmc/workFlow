@@ -3,13 +3,11 @@
     <component
       :is="getComponent"
       :isTried.sync="isTried"
-      :dataFields="dataFields"
       @openDrawer="setPerson"
       v-model="nodeConfig"
     />
     <nodeWrap
       v-if="nodeConfig.childNode && nodeConfig.childNode"
-      :dataFields="dataFields"
       v-model="nodeConfig.childNode"
       :isTried.sync="isTried"
     ></nodeWrap>
@@ -41,376 +39,15 @@
           @click="editNodename"
         ></i>
       </div>
+
       <div>
-        <div
-          class="drawer-content"
-          v-if="approverConfig.type == 1"
-        >
-          <el-tabs :is-hide-nav="true">
-            <el-tab-pane label="节点类型">
-              <el-radio-group
-                v-model="approverConfig.examineMode"
-                @change="setExamineModeRadio"
-              >
-                <el-radio
-                  v-for="item in examineModeList"
-                  :key="item.value"
-                  :label="item.value"
-                >
-                  {{ item.label }}
-                  <span class="mark">({{ item.mark }})</span>
-                </el-radio>
-              </el-radio-group>
-            </el-tab-pane>
-            <el-tab-pane label="审批人类型">
-              <div v-if="approverConfig.examineMode === '3'">
-                <p style="margin-bottom:16px">
-                  连续多级部门主管<span style="color:#828282;margin-left:8px">(按照组织架构，发起人<span style="color:#4880FF;">向上的各级主管</span>依次审批)</span>
-                </p>
-                <el-radio-group v-model="approverConfig.nodeUserType.value">
-                  <el-radio :label="`m-${directorLevel}`">
-                    <span style="margin-right:8px">直到发起人向上的</span>
-                    <el-select
-                      style="width:140px"
-                      v-model="directorLevel"
-                      placeholder="请选择"
-                    >
-                      <el-option
-                        v-for="(item, index) in directorLevelList"
-                        :key="index"
-                        :label="item.label"
-                        :value="item.value"
-                      ></el-option>
-                    </el-select>
-                  </el-radio>
-                  <cptPopver :type="true"></cptPopver>
-                  <el-radio :label="directorLevel">
-                    <span style="margin-right:8px">直到</span>
-                    <el-select
-                      style="width:140px"
-                      v-model="directorLevel"
-                      placeholder="请选择"
-                    >
-                      <el-option
-                        v-for="(item, index) in directorLevelList"
-                        :key="index"
-                        :label="item.label"
-                        :value="item.value"
-                      ></el-option>
-                    </el-select>
-                  </el-radio>
-                  <cptPopver></cptPopver>
-                </el-radio-group>
-              </div>
-              <div v-else>
-                <el-radio-group
-                  v-model="approverConfig.nodeUserType.type"
-                  @change="setTypeRadio"
-                >
-                  <el-radio label="manager">部门主管</el-radio>
-                  <el-radio label="role">审批角色</el-radio>
-                  <el-radio label="user">指定用户</el-radio>
-                </el-radio-group>
-                <div v-if=" approverConfig.nodeUserType.type && approverConfig.nodeUserType.type !== 'manager' ">
-                  <el-form
-                    ref="form"
-                    label-width="90px"
-                  >
-                    <el-form-item :label="setTypeLabel">
-                      <div v-if="approverConfig.nodeUserType.type === 'user'">
-                        <el-select
-                          v-model="approverConfig.nodeUserType.valueList"
-                          remote
-                          :remote-method="remoteMethod"
-                          filterable
-                          multiple
-                          placeholder="请选择"
-                        >
-                          <el-option
-                            v-for="item in useroptions"
-                            :key="item.id"
-                            :label="item.userName"
-                            :value="item.id"
-                          > </el-option>
-                        </el-select>
-                      </div>
-                      <div v-if="approverConfig.nodeUserType.type === 'role'">
-                        <el-select
-                          v-model="approverConfig.nodeUserType.valueList"
-                          filterable
-                          multiple
-                          placeholder="请选择"
-                        >
-                          <el-option
-                            v-for="item in useroptions"
-                            :key="item.id"
-                            :label="item.name"
-                            :value="item.id"
-                          > </el-option>
-                        </el-select>
-                      </div>
-                    </el-form-item>
-                  </el-form>
-                </div>
-              </div>
-            </el-tab-pane>
-          </el-tabs>
-        </div>
-        <div
-          class="drawer-content"
-          v-if="approverConfig.type == 2"
-        >
-          <el-tabs :is-hide-nav="true">
-            <el-tab-pane label="抄送人类型">
-              <div>
-                <el-radio-group
-                  v-model="approverConfig.nodeUserType.type"
-                  @change="setTypeRadio"
-                >
-                  <el-radio label="manager">连续多级部门主管</el-radio>
-                  <el-radio label="role">抄送角色</el-radio>
-                  <el-radio label="user">指定用户</el-radio>
-                </el-radio-group>
-                <div v-if=" approverConfig.nodeUserType.type !== 'manager' ">
-                  <el-form
-                    ref="form"
-                    label-width="90px"
-                    v-if="approverConfig.nodeUserType.type"
-                  >
-                    <el-form-item :label="setTypeLabel">
-                      <div v-if="approverConfig.nodeUserType.type === 'user'">
-                        <el-select
-                          v-model="approverConfig.nodeUserType.valueList"
-                          remote
-                          :remote-method="remoteMethod"
-                          filterable
-                          multiple
-                          placeholder="请选择"
-                        >
-                          <el-option
-                            v-for="item in useroptions"
-                            :key="item.id"
-                            :label="item.userName"
-                            :value="item.id"
-                          > </el-option>
-                        </el-select>
-                      </div>
-                      <div v-if="approverConfig.nodeUserType.type === 'role'">
-                        <el-select
-                          v-model="approverConfig.nodeUserType.valueList"
-                          filterable
-                          multiple
-                          placeholder="请选择"
-                        >
-                          <el-option
-                            v-for="item in useroptions"
-                            :key="item.id"
-                            :label="item.name"
-                            :value="item.id"
-                          > </el-option>
-                        </el-select>
-                      </div>
-                    </el-form-item>
-                  </el-form>
-                </div>
-                <div v-else>
-                  <p style="margin-bottom:16px;font-size:14px">
-                    按组织架构，发起人<span style="color:#4880FF;">向上的各级主管</span>依次抄送
-                  </p>
-                  <el-radio-group v-model=" approverConfig.nodeUserType.value ">
-                    <el-radio :label="`m-${directorLevel}`">
-                      <span style="margin-right:8px">直到发起人向上的</span>
-                      <el-select
-                        style="width:140px"
-                        v-model="directorLevel"
-                        placeholder="请选择"
-                        @change=" approverConfig.nodeUserType.value = `m-${directorLevel}` "
-                      >
-                        <el-option
-                          v-for="(item, index) in directorLevelList"
-                          :key="index"
-                          :label="item.label"
-                          :value="item.value"
-                        ></el-option>
-                      </el-select>
-                    </el-radio>
-                    <cptPopver :type="true"></cptPopver>
-                    <el-radio :label="directorLevel">
-                      <span style="margin-right:8px">直到</span>
-                      <el-select
-                        style="width:140px"
-                        v-model="directorLevel"
-                        placeholder="请选择"
-                        @change=" approverConfig.nodeUserType.value = directorLevel "
-                      >
-                        <el-option
-                          v-for="(item, index) in directorLevelList"
-                          :key="index"
-                          :label="item.label"
-                          :value="item.value"
-                        ></el-option>
-                      </el-select>
-                    </el-radio>
-                    <cptPopver></cptPopver>
-                  </el-radio-group>
-                </div>
-              </div>
-            </el-tab-pane>
-          </el-tabs>
-        </div>
-        <div
-          class="drawer-content drawer-content-condition"
-          v-if="approverConfig.type == 3"
-        >
-          <!-- 默认条件 -->
-          <div
-            v-if="defaultApprovalDrawer"
-            class="default-style"
-          >其他情况</div>
-          <div v-else>
-            <div
-              v-for="(item, index) in approverConfig.conditionList"
-              :key="index"
-            >
-              <div class="condition-conent-group">
-                <div class="condition-group-title flex">
-                  <div class="dang-style">条件组</div>
-                  <div>
-                    <i
-                      class="remove el-icon-delete"
-                      @click="removeCondition('group', index)"
-                    ></i>
-                  </div>
-                </div>
-                <div
-                  class="condition-group-select"
-                  v-for="(it, ind) in item.conditionChildrenNodes"
-                  :key="ind"
-                >
-                  <div class="mg-bot-10">
-                    <div
-                      v-if="ind === 0"
-                      class="flex flex-style"
-                    >
-                      <span class="dang-style">当</span>
-                      <i
-                        class="remove el-icon-delete"
-                        @click=" removeCondition( 'oneCondition', index, ind ) "
-                      ></i>
-                    </div>
-                    <div
-                      v-else
-                      class="flex"
-                    >
-                      <el-select
-                        style="width: 110px;"
-                        v-model="it.conditionOperator"
-                        placeholder="请选择"
-                      >
-                        <el-option
-                          label="且"
-                          :value="'&&'"
-                        ></el-option>
-                        <el-option
-                          label="或"
-                          :value="'||'"
-                        ></el-option>
-                      </el-select>
-                      <i
-                        class="remove iconfont icon-icon_viewpicture_delete"
-                        @click=" removeCondition( 'oneCondition', index, ind ) "
-                      ></i>
-                    </div>
-                  </div>
-                  <el-row
-                    :gutter="5"
-                    class="mg-bot-10"
-                  >
-                    <el-col :span="8">
-                      <el-select
-                        v-model="it.leftFileds"
-                        placeholder="请选择"
-                        @change="dataFieldsChange(it)"
-                      >
-                        <el-option
-                          v-for="item in dataFields"
-                          :label="item.name"
-                          :value="item.key"
-                          :key="item.key"
-                        ></el-option>
-                      </el-select>
-                    </el-col>
-                    <el-col :span="5">
-                      <el-select
-                        v-model="it.centerFileds"
-                        placeholder="请选择"
-                      >
-                        <el-option
-                          v-for="item in operatorList"
-                          :label="item"
-                          :value="item"
-                          :key="item"
-                        ></el-option>
-                      </el-select>
-                    </el-col>
-                    <el-col :span="10">
-                      <el-date-picker
-                        v-model="it.rightFileds"
-                        v-if="it.leftFiledsType === 'date'"
-                        type="date"
-                        placeholder="选择日期"
-                        value-format="yyyy-MM-dd"
-                      >
-                      </el-date-picker>
-                      <el-input
-                        v-else
-                        v-model="it.rightFileds"
-                        placeholder="请输入"
-                      ></el-input>
-                    </el-col>
-                  </el-row>
-                </div>
-                <div
-                  class="conditionbtn"
-                  @click="addConditionGroup('1', item)"
-                >
-                  <el-button type="">
-                    <i class="el-button-suffix el-icon-plus"></i>添加条件
-                  </el-button>
-                </div>
-              </div>
-              <div
-                v-if=" index === 0 && approverConfig.conditionList.length > 1 "
-                class="flex"
-                style="height:54px;padding:0 24px"
-              >
-                <el-select
-                  style="width: 110px;margin-top:7px"
-                  v-model="item.conditionGroupOperator"
-                  placeholder="请选择"
-                >
-                  <el-option
-                    label="且"
-                    :value="'&&'"
-                  ></el-option>
-                  <el-option
-                    label="或"
-                    :value="'||'"
-                  ></el-option>
-                </el-select>
-              </div>
-            </div>
-            <div class="conditionbtn">
-              <el-button
-                type=""
-                @click="addConditionGroup('0')"
-              >
-                <i class="el-button-suffix el-icon-plus"></i>添加条件组
-              </el-button>
-            </div>
-          </div>
-        </div>
+        <component
+          :is="getFormComponent"
+          v-model="approverConfig"
+          :defaultApprovalDrawer="defaultApprovalDrawer"
+        />
       </div>
+
       <div class="set_promoter_footer flex">
         <!-- 默认条件弹框只展示关闭按钮 -->
         <div v-if="defaultApprovalDrawer">
@@ -436,66 +73,25 @@
 </template>
 <script>
 import addNode from "./addNode";
-import cptPopver from "./cptPopver";
 import branch from "./node/branch.vue";
 import normal from "./node/normal.vue";
 
+import auditForm from "./form/auditForm.vue";
+import carbonForm from "./form/carbonForm.vue";
+import conditionForm from "./form/conditionForm.vue";
 export default {
   name: "nodeWrap",
-  components: { addNode, cptPopver, branch, normal },
-  props: ["isTried", "dataFields", "value"],
+  components: { addNode, branch, normal, auditForm, carbonForm, conditionForm },
+  props: ["isTried", "value"],
   model: {
     prop: "value",
     event: "input",
   },
   data() {
     return {
-      directorLevelList: [
-        {
-          value: "1",
-          label: "第一级主管",
-        },
-        {
-          value: "2",
-          label: "第二级主管",
-        },
-        {
-          value: "3",
-          label: "第三级主管",
-        },
-        {
-          value: "4",
-          label: "第四级主管",
-        },
-        {
-          value: "5",
-          label: "第五级主管",
-        },
-        {
-          value: "6",
-          label: "第六级主管",
-        },
-        {
-          value: "7",
-          label: "第七级主管",
-        },
-        {
-          value: "8",
-          label: "第八级主管",
-        },
-        {
-          value: "9",
-          label: "第九级主管",
-        },
-        {
-          value: "10",
-          label: "第十级主管",
-        },
-      ],
       //审批弹框字段Obj
       approverConfig: {},
       searchUser: "",
-      directorLevel: "1", //主管层级
       nodeUser: "", //审批人（stringList）
       approverDrawer: false, //审批弹框
       defaultApprovalDrawer: false, //默认条件弹框
@@ -503,45 +99,13 @@ export default {
       //条件弹框字段
       conditionsConfig: {},
       conditionConfig: {}, //条件弹框item
-      useroptions: [
-        { name: "admin", id: "1", userName: "admin" },
-        { name: "Anna", id: "2", userName: "Anna" },
-      ],
-      userInfo: {
-        data: [],
-        total: 0,
-      },
-      examineModeList: [
-        {
-          value: "1",
-          label: "会签审批",
-          mark: "需要所有审批人同意，该审批节点才通过",
-        },
-        {
-          value: "2",
-          label: "或签审批",
-          mark: "任意一名审批人同意，该审批节点即通过",
-        },
-        {
-          value: "3",
-          label: "逐级审批",
-          mark: "按人事部门层级逐级依次审批后，该审批节点才通过",
-        },
-      ],
-      operatorList: ["=", "!=", ">", ">=", "<", "<="],
+
       // -----
       isInputList: [],
       isInput: false,
       hasFlag: false,
       conditionTip: "",
       bPriorityLevel: "",
-      conditionList: [],
-      pager: {
-        current: 1,
-        size: 10,
-      },
-      selectionList: [], //表格选中id
-      userOriginList: [],
     };
   },
   provide() {
@@ -554,10 +118,6 @@ export default {
     approverDrawer(val) {
       if (!val) {
         this.defaultApprovalDrawer = false;
-      }
-    },
-    approverDrawer(val) {
-      if (!val) {
         this.hasFlag = false;
         this.conditionTip = "";
       }
@@ -587,94 +147,20 @@ export default {
           return "branch";
       }
     },
-    setTypeLabel() {
-      if (this.approverConfig.nodeUserType.type === "manager")
-        return "部门主管：";
-      if (
-        this.approverConfig.nodeUserType.type === "role" &&
-        this.approverConfig.type === 1
-      )
-        return "审批角色：";
-      if (
-        this.approverConfig.nodeUserType.type === "role" &&
-        this.approverConfig.type === 2
-      )
-        return "抄送角色：";
-      if (this.approverConfig.nodeUserType.type === "user") return "指定用户：";
-      return "";
+    // 获取表单组件
+    getFormComponent() {
+      let nodeType = this.$nodeType;
+      switch (this.approverConfig.type) {
+        case nodeType.审核人:
+          return "auditForm";
+        case nodeType.抄送人:
+          return "carbonForm";
+        case nodeType.条件:
+          return "conditionForm";
+      }
     },
   },
   methods: {
-    remoteMethod(query) {
-      this.searchUser = query;
-      if (query !== "") {
-        if (this.approverConfig.nodeUserType.type === "user") {
-          // this.companyUsersList();
-        }
-      } else {
-        this.useroptions = this.userOriginList;
-      }
-    },
-    selectionChange(val) {
-      this.selectionList = val.map((item) => item.id);
-    },
-    saveUserInfo() {
-      this.approverConfig.nodeUserType.valueList = this.selectionList;
-      // this.dialogFlag = false;
-    },
-    //删除条件组和条件
-    removeCondition(conditonflag, index, ind) {
-      if (conditonflag === "group") {
-        this.approverConfig.conditionList.splice(index, 1);
-        return;
-      }
-      this.approverConfig.conditionList[index].conditionChildrenNodes.splice(
-        ind,
-        1
-      );
-    },
-    //审批选择节点
-    setExamineModeRadio(val) {
-      this.$set(this.approverConfig.nodeUserType, "value", "");
-      this.$set(this.approverConfig.nodeUserType, "valueList", []);
-      if (val === "3") {
-        this.approverConfig.nodeUserType.type = "manager";
-      }
-    },
-    //添加条件组
-    addConditionGroup(flag, item) {
-      if (flag === "1") {
-        item.conditionChildrenNodes.push({
-          conditionOperator: "",
-          leftFileds: "",
-          centerFileds: "",
-          rightFileds: "",
-        });
-        return;
-      }
-      this.approverConfig.conditionList.push({
-        conditionChildrenNodes: [],
-        conditionGroupOperator: "",
-      });
-    },
-    //节点类型
-    setTypeRadio(val) {
-      if (this.approverConfig.nodeUserType.valueList.length > 0) {
-        this.approverConfig.nodeUserType.valueList = "";
-      }
-      // this.approverConfig.nodeUserType.value = ''
-      if (val === "role") {
-        // this.companyRoles()
-        return;
-      }
-      if (val === "user") {
-        // this.companyUsersList()
-        return;
-      }
-      if (val === "manager") {
-        this.approverConfig.nodeUserType.value = "部门主管";
-      }
-    },
     //修改节点name
     editNodename() {
       this.$set(this.approverConfig, "titleInputFlag", true);
@@ -726,10 +212,10 @@ export default {
           if (num.indexOf("m") !== -1) {
             num = num.substring(2);
           }
-          this.directorLevelList.forEach((item, index) => {
-            if (index === num - 1)
-              this.approverConfig.nodeUserType.valueName = item.label;
-          });
+          // this.directorLevelList.forEach((item, index) => {
+          //   if (index === num - 1)
+          //     this.approverConfig.nodeUserType.valueName = item.label;
+          // });
           // 默认值
           if (
             this.approverConfig.type === 1 &&
@@ -817,15 +303,7 @@ export default {
         this.nodeConfig = this.conditionsConfig;
       }
     },
-    //条件字段显示name
-    dataFieldsChange(it) {
-      this.dataFields.forEach((item) => {
-        if (item.key === it.leftFileds) {
-          this.$set(it, "leftFiledsName", item.name);
-          this.$set(it, "leftFiledsType", item.type);
-        }
-      });
-    },
+
     //审批人抄送人显示和校验
     setApproverStr(nodeConfig) {
       let type = "会签";
@@ -869,13 +347,6 @@ export default {
         }
         // 角色、用户
         return `给${role}：${nodeConfig.nodeUserType.valueName}抄送`;
-      }
-    },
-    reData(data, addData) {
-      if (!data.childNode) {
-        data.childNode = addData;
-      } else {
-        this.reData(data.childNode, addData);
       }
     },
     //打开弹框

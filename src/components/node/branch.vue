@@ -2,7 +2,7 @@
  * @Author: 羊驼
  * @Date: 2023-04-25 10:57:30
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-04-25 13:41:21
+ * @LastEditTime: 2023-04-25 17:02:52
  * @Description: 分支情况
 -->
 <template>
@@ -73,8 +73,7 @@
           </div>
           <nodeWrap
             v-if="item.childNode && item.childNode"
-            :dataFields="dataFields"
-            :nodeConfig.sync="item.childNode"
+            v-model="item.childNode"
             :isTried.sync="isTried"
           ></nodeWrap>
           <div
@@ -93,7 +92,6 @@
             class="bottom-right-cover-line"
             v-if="index == nodeConfig.conditionNodes.length - 1"
           ></div>
-
         </div>
       </div>
       <addNode
@@ -106,7 +104,6 @@
 
 <script>
 import mixin from "./mixin";
-
 export default {
   mixins: [mixin],
   computed: {
@@ -155,6 +152,7 @@ export default {
     },
     // 调整条件位置
     arrTransfer(index, type = 1) {
+      // TODO 需要调整一下 默认情况是不能调整位置的 以及添加条件必须在默认前 否则影响判断
       //向左-1,向右1
       this.nodeConfig.conditionNodes[index] =
         this.nodeConfig.conditionNodes.splice(
@@ -192,6 +190,13 @@ export default {
           }
         }
         this.$emit("input", this.nodeConfig.conditionNodes[0].childNode);
+      }
+    },
+    reData(data, addData) {
+      if (!data.childNode) {
+        data.childNode = addData;
+      } else {
+        this.reData(data.childNode, addData);
       }
     },
   },

@@ -51,6 +51,7 @@ export default {
     // 新增类型
     addType(type) {
       this.visible = false;
+      // 判断这个节点是不是判断节点 不能嵌套太多层条件 否则会出问题
       let data = this.$factory.getStruct(type, this.childNodeP);
       if (this.$flowConfig.createPopupImmediately) {
         //添加节点自动弹出弹框

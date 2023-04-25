@@ -2,7 +2,7 @@
  * @Author: 羊驼
  * @Date: 2023-04-25 09:10:13
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-04-25 14:40:06
+ * @LastEditTime: 2023-04-25 17:03:13
  * @Description: file content
  */
 import Vue from 'vue'
@@ -14,7 +14,6 @@ import "@/utils/config.js"
 
 Vue.config.productionTip = false
 Vue.use(ElementUI);
-
 new Vue({
   router,
   render: h => h(App),
