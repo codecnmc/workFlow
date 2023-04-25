@@ -25,18 +25,12 @@
           id="box-scale"
           :style="'transform: scale('+nowVal/100+'); transform-origin: 50% 0px 0px;'"
         >
-          <div class="end-node flex">
-            <p>开始</p>
-          </div>
           <nodeWrap
             v-bind="$attrs"
-            :nodeConfig="nodeConfig"
+            v-model="nodeConfig"
             :dataFields="dataFields"
             :isTried="isTried"
           ></nodeWrap>
-          <div class="end-node flex">
-            <p>结束</p>
-          </div>
         </div>
       </div>
     </div>
@@ -185,7 +179,7 @@ export default {
   justify-content: flex-end;
   padding-right: 150px;
   .zoom {
-    span{
+    span {
       padding: 0 10px;
     }
     height: 40px;
@@ -228,6 +222,7 @@ export default {
 }
 .approval-flow {
   .dingflow-design {
+    padding-top: 20px;
     .box-scale {
       transform: scale(1);
       display: inline-block;
@@ -578,7 +573,7 @@ export default {
   display: flex;
   align-items: center;
   max-width: calc(100% - 36px);
-  padding: 0 18px;
+  padding: 0 26px;
   overflow: hidden;
   text-overflow: ellipsis;
   font-size: 14px;
@@ -595,20 +590,20 @@ export default {
 }
 
 .dingflow-design .auto-judge .sort-left {
-  left: 4px;
-  top: 33px;
-  color: rgba(0, 0, 0, 0.5);
+  left: 8px;
+  top: 35px;
 }
 
 .dingflow-design .auto-judge .sort-right {
   right: 26px;
-  top: 33px;
+  top: 35px;
 }
 
 .dingflow-design .auto-judge:hover .sort-left,
 .dingflow-design .auto-judge:hover .sort-right {
   display: flex;
   align-items: center;
+  color: rgba(0, 0, 0, 0.5);
 }
 
 .dingflow-design .add-node-btn {

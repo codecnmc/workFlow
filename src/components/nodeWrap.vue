@@ -1,170 +1,16 @@
 <template>
   <div class="nodeflow-components">
-    <div
-      class="node-wrap"
-      v-if="nodeConfig.type != 4"
-    >
-      <div
-        class="node-wrap-box"
-        v-if="nodeConfig.type && nodeConfig.type != 0"
-        :class=" (nodeConfig.type == 0 ? 'start-node ' : '') + (isTried && nodeConfig.error ? 'active error' : '') "
-      >
-        <div @click="setPerson">
-          <div
-            class="title"
-            :style="
-                        'background: rgb(' + [ '87, 106, 149', '230, 162, 60', '72, 128, 255', ][nodeConfig.type] + ');' "
-          >
-            <span class="editable-title">{{ nodeConfig.nodeName }}</span>
-            <i
-              class="el-icon-close close"
-              v-if="nodeConfig.type != 0"
-              @click.stop="delNode()"
-            ></i>
-          </div>
-          <div class="content">
-            <div
-              class="text"
-              v-if="nodeConfig.type == 1"
-            >
-              <span
-                class="placeholder"
-                v-if="setApproverStr(nodeConfig) === ''"
-              >
-                请选择{{ placeholderList[nodeConfig.type] }}
-              </span>
-              {{ setApproverStr(nodeConfig) }}
-            </div>
-            <div
-              class="text"
-              v-if="nodeConfig.type == 2"
-            >
-              <span
-                class="placeholder"
-                v-if="setApproverStr(nodeConfig) === ''"
-              >
-                请选择{{ placeholderList[nodeConfig.type] }}
-              </span>
-              {{ setApproverStr(nodeConfig) }}
-            </div>
-            <i class="el-icon-arrow-right arrow"></i>
-          </div>
-          <div
-            class="error_tip"
-            v-if="isTried && nodeConfig.error"
-          >
-            <i
-              class="el-icon-warning"
-              style="color: rgb(242, 86, 67);"
-            ></i>
-          </div>
-        </div>
-      </div>
-      <addNode :childNodeP.sync="nodeConfig.childNode"></addNode>
-    </div>
-    <div
-      class="branch-wrap"
-      v-if="nodeConfig.type == 4"
-    >
-      <div
-        class="branch-box-wrap"
-        :style="{'margin-left':condtionsOffset}"
-      >
-        <div class="branch-box">
-          <button
-            class="add-branch"
-            @click="addTerm"
-            :style="`margin-left:${conditionButtonOffset}`"
-          >
-            添加条件
-          </button>
-          <div
-            class="col-box"
-            v-for="(item, index) in nodeConfig.conditionNodes"
-            :key="index"
-          >
-            <div class="condition-node">
-              <div class="condition-node-box">
-                <div
-                  class="auto-judge"
-                  @click="setPerson(item.priorityLevel,item)"
-                  :class="isTried && item.error ? 'error active' : '' "
-                >
-                  <div
-                    class="sort-left"
-                    v-if="index != 0"
-                    @click.stop="arrTransfer(index, -1)"
-                  >
-                    &lt;
-                  </div>
-                  <div class="title-wrapper">
-                    <span class="editable-title">{{ item.nodeName }}</span>
-                    <span class="priority-title">优先级{{ item.priorityLevel }}</span>
-                    <i
-                      class="el-icon-close close"
-                      @click.stop="delTerm(index)"
-                    ></i>
-                  </div>
-                  <div
-                    class="sort-right"
-                    v-if=" index != nodeConfig.conditionNodes .length - 1 "
-                    @click.stop="arrTransfer(index)"
-                  > &gt; </div>
-                  <div class="content">
-                    {{ conditionStr(item, index) }}
-                  </div>
-                  <div
-                    class="error_tip"
-                    v-if="isTried && item.error"
-                  >
-                    <i
-                      class="el-icon-warning"
-                      style="color: rgb(242, 86, 67);"
-                    ></i>
-                  </div>
-                </div>
-                <addNode
-                  :childNodeP.sync="item.childNode"
-                  :tip="'条件'"
-                ></addNode>
-              </div>
-            </div>
-            <nodeWrap
-              v-if="item.childNode && item.childNode"
-              :dataFields="dataFields"
-              :nodeConfig.sync="item.childNode"
-              :isTried.sync="isTried"
-            ></nodeWrap>
-            <div
-              class="top-left-cover-line"
-              v-if="index == 0"
-            ></div>
-            <div
-              class="bottom-left-cover-line"
-              v-if="index == 0"
-            ></div>
-            <div
-              class="top-right-cover-line"
-              v-if="index == nodeConfig.conditionNodes.length - 1"
-            ></div>
-            <div
-              class="bottom-right-cover-line"
-              v-if="index == nodeConfig.conditionNodes.length - 1"
-            ></div>
-
-          </div>
-        </div>
-        <addNode
-          :childNodeP.sync="nodeConfig.childNode"
-          :style="`margin-left:${condtionAddButton}`"
-        ></addNode>
-      </div>
-
-    </div>
+    <component
+      :is="getComponent"
+      :isTried.sync="isTried"
+      :dataFields="dataFields"
+      @openDrawer="setPerson"
+      v-model="nodeConfig"
+    />
     <nodeWrap
       v-if="nodeConfig.childNode && nodeConfig.childNode"
       :dataFields="dataFields"
-      :nodeConfig.sync="nodeConfig.childNode"
+      v-model="nodeConfig.childNode"
       :isTried.sync="isTried"
     ></nodeWrap>
     <el-drawer
@@ -591,17 +437,19 @@
 <script>
 import addNode from "./addNode";
 import cptPopver from "./cptPopver";
-// import {
-//   companyRoles, //树状app角色
-//   companyUsersList, //用户列表
-// } from '@/api/company'
+import branch from "./node/branch.vue";
+import normal from "./node/normal.vue";
+
 export default {
   name: "nodeWrap",
-  components: { addNode, cptPopver },
-  props: ["nodeConfig", "isTried", "dataFields"],
+  components: { addNode, cptPopver, branch, normal },
+  props: ["isTried", "dataFields", "value"],
+  model: {
+    prop: "value",
+    event: "input",
+  },
   data() {
     return {
-      placeholderList: ["发起人", "审核人", "抄送人"],
       directorLevelList: [
         {
           value: "1",
@@ -696,6 +544,12 @@ export default {
       userOriginList: [],
     };
   },
+  provide() {
+    return {
+      setApproverStr: this.setApproverStr,
+      conditionStr: this.conditionStr,
+    };
+  },
   watch: {
     approverDrawer(val) {
       if (!val) {
@@ -709,32 +563,26 @@ export default {
       }
     },
   },
-
   computed: {
-    // 条件分支偏移量
-    condtionsOffset() {
-      let nodeLength = this.nodeConfig.conditionNodes.length;
-      // 1080p下 五个极限了 再靠左就遮住了 所以往右偏移一点
-      if (nodeLength > 5) {
-        return -240 - 3 * 190 + "px";
-      }
-      return -240 - (this.nodeConfig.conditionNodes.length - 2) * 190 + "px";
+    // v-model绑定
+    nodeConfig: {
+      get() {
+        return this.value;
+      },
+      set(value) {
+        this.$emit("input", value);
+      },
     },
-    // 条件分支添加条件按钮偏移量
-    conditionButtonOffset() {
-      let nodeLength = this.nodeConfig.conditionNodes.length;
-      if (nodeLength > 5) {
-        return -(nodeLength - 5) * 190 + "px";
+    // 获取节点组件
+    getComponent() {
+      switch (this.nodeConfig.type) {
+        case 0:
+        case 1:
+        case 2:
+          return "normal";
+        case 4:
+          return "branch";
       }
-      return 0;
-    },
-    // 解决条件分支添加按钮偏移量
-    condtionAddButton() {
-      let nodeLength = this.nodeConfig.conditionNodes.length;
-      if (nodeLength > 5) {
-        return -(nodeLength - 5) * 380 + "px";
-      }
-      return 0;
     },
     setTypeLabel() {
       if (this.approverConfig.nodeUserType.type === "manager")
@@ -752,19 +600,6 @@ export default {
       if (this.approverConfig.nodeUserType.type === "user") return "指定用户：";
       return "";
     },
-  },
-  async mounted() {
-    if (this.nodeConfig.type == 1) {
-      this.nodeConfig.error = this.setApproverStr(this.nodeConfig) == "";
-    } else if (this.nodeConfig.type == 2) {
-      this.nodeConfig.error = this.setApproverStr(this.nodeConfig) === "";
-    } else if (this.nodeConfig.type == 4) {
-      for (var i = 0; i < this.nodeConfig.conditionNodes.length; i++) {
-        this.nodeConfig.conditionNodes[i].error =
-          this.conditionStr(this.nodeConfig.conditionNodes[i], i) ==
-          "请设置条件";
-      }
-    }
   },
   methods: {
     remoteMethod(query) {
@@ -844,70 +679,6 @@ export default {
     nodeNameBlur() {
       this.$set(this.approverConfig, "titleInputFlag", false);
     },
-    //条件显示
-    conditionStr(item, index) {
-      let {
-        conditionList, //条件组
-        conditionString, //条件数据
-        conditionStringName, //条件显示
-      } = item;
-      let arr = [true]; //判断条件是否有值
-      if (conditionList.length === 0 || conditionString === "") {
-        if (item.nodeName === "默认") {
-          return "其他情况";
-        }
-        return "请设置条件";
-      }
-      if (conditionList.length !== 0) {
-        if (conditionList.length === 1) {
-          //当条件组为一个
-          conditionList[0].conditionChildrenNodes &&
-            conditionList[0].conditionChildrenNodes.forEach((item, index) => {
-              if (
-                item.leftFileds == "" ||
-                item.centerFileds == "" ||
-                item.rightFileds == ""
-              ) {
-                arr.push(false);
-              }
-              if (index !== 0 && item.conditionOperator == "") {
-                arr.push(false);
-              }
-            });
-        } else {
-          //当条件组为多个（判断是否有运算符）
-          conditionList.forEach((item, index) => {
-            if (index != conditionList.length - 1) {
-              //条件组不为最后一个.校验是否有条件运算符
-              if (item.conditionGroupOperator == "") arr.push(false);
-            }
-            if (
-              item.conditionChildrenNodes &&
-              item.conditionChildrenNodes.length > 0
-            ) {
-              item.conditionChildrenNodes.forEach((it, ind) => {
-                if (
-                  it.leftFileds === "" ||
-                  it.centerFileds === "" ||
-                  it.rightFileds == ""
-                )
-                  arr.push(false);
-                if (ind !== 0 && it.conditionOperator == "") arr.push(false);
-              });
-            } else if (
-              item.conditionChildrenNodes &&
-              item.conditionChildrenNodes.length == 0
-            ) {
-              arr.push(false);
-            }
-          });
-        }
-        if (arr.includes(false)) {
-          return "请设置条件";
-        }
-      }
-      return conditionStringName;
-    },
     dealStr(str, obj) {
       let arr = [];
       let list = str.split(",");
@@ -919,51 +690,6 @@ export default {
         });
       }
       return arr.join("或");
-    },
-    //审批人抄送人显示和校验
-    setApproverStr(nodeConfig) {
-      let type = "会签";
-      let role = "部门主管";
-      if (nodeConfig.nodeUserType.type === "role") role = "角色";
-      if (nodeConfig.nodeUserType.type === "user") role = "用户";
-      if (nodeConfig.nodeUserType.value == "") return "";
-      if (nodeConfig.type === 1) {
-        //审批
-        if (nodeConfig.examineMode === "1") type = "会签";
-        if (nodeConfig.examineMode === "2") type = "或签";
-        if (nodeConfig.examineMode === "3") type = "逐级审批";
-        if (
-          nodeConfig.nodeUserType.type === "manager" &&
-          nodeConfig.examineMode === "3"
-        ) {
-          if (nodeConfig.nodeUserType.value.indexOf("m") != -1) {
-            return `由发起人向上的${nodeConfig.nodeUserType.valueName}审批`;
-          } else {
-            return `由${nodeConfig.nodeUserType.valueName}审批`;
-          }
-        }
-        if (
-          nodeConfig.nodeUserType.type === "manager" &&
-          nodeConfig.examineMode !== "3"
-        ) {
-          return `由${role}${type}`;
-        }
-        return `由${role}：${nodeConfig.nodeUserType.valueName}${type}`;
-      }
-      if (nodeConfig.type === 2) {
-        //抄送
-        if (nodeConfig.nodeUserType.value == "") return "";
-        if (nodeConfig.nodeUserType.type === "manager") {
-          //主管
-          if (nodeConfig.nodeUserType.value.indexOf("m") != -1) {
-            return `给发起人向上的${nodeConfig.nodeUserType.valueName}抄送`;
-          } else {
-            return `给${nodeConfig.nodeUserType.valueName}抄送`;
-          }
-        }
-        // 角色、用户
-        return `给${role}：${nodeConfig.nodeUserType.valueName}抄送`;
-      }
     },
     //保存弹框设置
     saveApprover() {
@@ -1098,52 +824,49 @@ export default {
         }
       });
     },
-    //删除节点
-    delNode() {
-      this.$emit("update:nodeConfig", this.nodeConfig.childNode);
-    },
-    //添加条件
-    addTerm() {
-      let len = this.nodeConfig.conditionNodes.length;
-      this.nodeConfig.conditionNodes.push({
-        nodeName: "条件" + len,
-        type: 3,
-        priorityLevel: len + 1,
-        conditionList: [],
-        childNode: null,
-      });
-      for (var i = 0; i < this.nodeConfig.conditionNodes.length; i++) {
-        this.nodeConfig.conditionNodes[i].error =
-          this.conditionStr(this.nodeConfig.conditionNodes[i], i) ==
-            "请设置条件" && i != this.nodeConfig.conditionNodes.length - 1;
-      }
-      this.$emit("update:nodeConfig", this.nodeConfig);
-    },
-    //删除条件
-    delTerm(index) {
-      this.nodeConfig.conditionNodes.splice(index, 1);
-      for (var i = 0; i < this.nodeConfig.conditionNodes.length; i++) {
-        this.nodeConfig.conditionNodes[i].error =
-          this.conditionStr(this.nodeConfig.conditionNodes[i], i) ==
-            "请设置条件" && i != this.nodeConfig.conditionNodes.length - 1;
-      }
-      this.$emit("update:nodeConfig", this.nodeConfig);
-      if (this.nodeConfig.conditionNodes.length == 1) {
-        if (this.nodeConfig.childNode) {
-          if (this.nodeConfig.conditionNodes[0].childNode) {
-            this.reData(
-              this.nodeConfig.conditionNodes[0].childNode,
-              this.nodeConfig.childNode
-            );
+    //审批人抄送人显示和校验
+    setApproverStr(nodeConfig) {
+      let type = "会签";
+      let role = "部门主管";
+      if (nodeConfig.nodeUserType.type === "role") role = "角色";
+      if (nodeConfig.nodeUserType.type === "user") role = "用户";
+      if (nodeConfig.nodeUserType.value == "") return "";
+      if (nodeConfig.type === 1) {
+        //审批
+        if (nodeConfig.examineMode === "1") type = "会签";
+        if (nodeConfig.examineMode === "2") type = "或签";
+        if (nodeConfig.examineMode === "3") type = "逐级审批";
+        if (
+          nodeConfig.nodeUserType.type === "manager" &&
+          nodeConfig.examineMode === "3"
+        ) {
+          if (nodeConfig.nodeUserType.value.indexOf("m") != -1) {
+            return `由发起人向上的${nodeConfig.nodeUserType.valueName}审批`;
           } else {
-            this.nodeConfig.conditionNodes[0].childNode =
-              this.nodeConfig.childNode;
+            return `由${nodeConfig.nodeUserType.valueName}审批`;
           }
         }
-        this.$emit(
-          "update:nodeConfig",
-          this.nodeConfig.conditionNodes[0].childNode
-        );
+        if (
+          nodeConfig.nodeUserType.type === "manager" &&
+          nodeConfig.examineMode !== "3"
+        ) {
+          return `由${role}${type}`;
+        }
+        return `由${role}：${nodeConfig.nodeUserType.valueName}${type}`;
+      }
+      if (nodeConfig.type === 2) {
+        //抄送
+        if (nodeConfig.nodeUserType.value == "") return "";
+        if (nodeConfig.nodeUserType.type === "manager") {
+          //主管
+          if (nodeConfig.nodeUserType.value.indexOf("m") != -1) {
+            return `给发起人向上的${nodeConfig.nodeUserType.valueName}抄送`;
+          } else {
+            return `给${nodeConfig.nodeUserType.valueName}抄送`;
+          }
+        }
+        // 角色、用户
+        return `给${role}：${nodeConfig.nodeUserType.valueName}抄送`;
       }
     },
     reData(data, addData) {
@@ -1208,55 +931,69 @@ export default {
         return;
       }
     },
-    //获取角色
-    // companyRoles() {
-    //   companyRoles(this.$store.state.userInfo.companyId).then((res) => {
-    //     res.data.forEach((item) => {
-    //       if (item.application.appNum === this.$route.query.appNum) {
-    //         this.useroptions = item.roleInfos
-    //       }
-    //     })
-    //   })
-    // },
-    //获取用户(有效)
-    // async companyUsersList() {
-    //   let params = {
-    //     companyId: this.$store.state.userInfo.companyId,
-    //     // current: this.pager.current,
-    //     size: 20000,
-    //     status: "enable",
-    //     nameLike: this.searchUser
-    //     // ...this.filters    //搜索条件
-    //   }
-    //   let res = await companyUsersList(params);
-    //   if (res.code === '200') {
-    //     res.data.records.forEach((item) => {
-    //       item.name = item.nickName ? item.nickName : item.userName
-    //     })
-    //     this.useroptions = res.data.records;
-    //     this.userInfo.data = res.data.records;
-    //     this.userInfo.total = res.data.total;
-    //     return res.data.records;
-    //   }
-
-    // },
-    arrTransfer(index, type = 1) {
-      //向左-1,向右1
-      this.nodeConfig.conditionNodes[index] =
-        this.nodeConfig.conditionNodes.splice(
-          index + type,
-          1,
-          this.nodeConfig.conditionNodes[index]
-        )[0];
-      this.nodeConfig.conditionNodes.map((item, index) => {
-        item.priorityLevel = index + 1;
-      });
-      for (var i = 0; i < this.nodeConfig.conditionNodes.length; i++) {
-        this.nodeConfig.conditionNodes[i].error =
-          this.conditionStr(this.nodeConfig.conditionNodes[i], i) ==
-            "请设置条件" && i != this.nodeConfig.conditionNodes.length - 1;
+    //条件显示
+    conditionStr(item, index) {
+      let {
+        conditionList, //条件组
+        conditionString, //条件数据
+        conditionStringName, //条件显示
+      } = item;
+      let arr = [true]; //判断条件是否有值
+      if (conditionList.length === 0 || conditionString === "") {
+        if (item.nodeName === "默认") {
+          return "其他情况";
+        }
+        return "请设置条件";
       }
-      this.$emit("update:nodeConfig", this.nodeConfig);
+      if (conditionList.length !== 0) {
+        if (conditionList.length === 1) {
+          //当条件组为一个
+          conditionList[0].conditionChildrenNodes &&
+            conditionList[0].conditionChildrenNodes.forEach((item, index) => {
+              if (
+                item.leftFileds == "" ||
+                item.centerFileds == "" ||
+                item.rightFileds == ""
+              ) {
+                arr.push(false);
+              }
+              if (index !== 0 && item.conditionOperator == "") {
+                arr.push(false);
+              }
+            });
+        } else {
+          //当条件组为多个（判断是否有运算符）
+          conditionList.forEach((item, index) => {
+            if (index != conditionList.length - 1) {
+              //条件组不为最后一个.校验是否有条件运算符
+              if (item.conditionGroupOperator == "") arr.push(false);
+            }
+            if (
+              item.conditionChildrenNodes &&
+              item.conditionChildrenNodes.length > 0
+            ) {
+              item.conditionChildrenNodes.forEach((it, ind) => {
+                if (
+                  it.leftFileds === "" ||
+                  it.centerFileds === "" ||
+                  it.rightFileds == ""
+                )
+                  arr.push(false);
+                if (ind !== 0 && it.conditionOperator == "") arr.push(false);
+              });
+            } else if (
+              item.conditionChildrenNodes &&
+              item.conditionChildrenNodes.length == 0
+            ) {
+              arr.push(false);
+            }
+          });
+        }
+        if (arr.includes(false)) {
+          return "请设置条件";
+        }
+      }
+      return conditionStringName;
     },
   },
 };

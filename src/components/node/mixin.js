@@ -2,16 +2,19 @@
  * @Author: 羊驼
  * @Date: 2023-04-25 10:34:46
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-04-25 10:53:00
+ * @LastEditTime: 2023-04-25 11:32:46
  * @Description: file content
  */
+import addNode from "../addNode";
 export default {
-    props: ["isTried", "value"],
+    components: { addNode },
+    props: ["isTried", "value", "dataFields"],
     model: {
         prop: "value",
         event: "input"
     },
     emits: ["openDrawer"],
+    inject: ["setApproverStr", "conditionStr"],
     computed: {
         nodeConfig: {
             get() {
@@ -31,58 +34,28 @@ export default {
         if (this.value == undefined) {
             throw Error("无绑定v-model 请绑定")
         }
+        switch (this.nodeConfig.type) {
+            case 1:
+            case 2:
+                this.nodeConfig.error = this.setApproverStr(this.nodeConfig) == "";
+                break;
+            case 4:
+                for (var i = 0; i < this.nodeConfig.conditionNodes.length; i++) {
+                    this.nodeConfig.conditionNodes[i].error =
+                        this.conditionStr(this.nodeConfig.conditionNodes[i], i) ==
+                        "请设置条件";
+                }
+                break;
+        }
     },
     methods: {
+        // 删除节点
         delNode() {
-            this.$emit("update:nodeConfig", this.nodeConfig.childNode);
+            this.nodeConfig.childNode && this.$emit("input", this.nodeConfig.childNode)
         },
-        //审批人抄送人显示和校验
-        setApproverStr(nodeConfig) {
-            let type = "会签";
-            let role = "部门主管";
-            if (nodeConfig.nodeUserType.type === "role") role = "角色";
-            if (nodeConfig.nodeUserType.type === "user") role = "用户";
-            if (nodeConfig.nodeUserType.value == "") return "";
-            if (nodeConfig.type === 1) {
-                //审批
-                if (nodeConfig.examineMode === "1") type = "会签";
-                if (nodeConfig.examineMode === "2") type = "或签";
-                if (nodeConfig.examineMode === "3") type = "逐级审批";
-                if (
-                    nodeConfig.nodeUserType.type === "manager" &&
-                    nodeConfig.examineMode === "3"
-                ) {
-                    if (nodeConfig.nodeUserType.value.indexOf("m") != -1) {
-                        return `由发起人向上的${nodeConfig.nodeUserType.valueName}审批`;
-                    } else {
-                        return `由${nodeConfig.nodeUserType.valueName}审批`;
-                    }
-                }
-                if (
-                    nodeConfig.nodeUserType.type === "manager" &&
-                    nodeConfig.examineMode !== "3"
-                ) {
-                    return `由${role}${type}`;
-                }
-                return `由${role}：${nodeConfig.nodeUserType.valueName}${type}`;
-            }
-            if (nodeConfig.type === 2) {
-                //抄送
-                if (nodeConfig.nodeUserType.value == "") return "";
-                if (nodeConfig.nodeUserType.type === "manager") {
-                    //主管
-                    if (nodeConfig.nodeUserType.value.indexOf("m") != -1) {
-                        return `给发起人向上的${nodeConfig.nodeUserType.valueName}抄送`;
-                    } else {
-                        return `给${nodeConfig.nodeUserType.valueName}抄送`;
-                    }
-                }
-                // 角色、用户
-                return `给${role}：${nodeConfig.nodeUserType.valueName}抄送`;
-            }
+        // 打开编辑弹窗
+        setPerson(priorityLevel, item, data, tip) {
+            this.$emit("openDrawer", priorityLevel, item, data, tip)
         },
-        setPerson() {
-            this.$emit("openDrawer")
-        }
     }
 }

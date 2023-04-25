@@ -2,7 +2,7 @@
  * @Author: 羊驼
  * @Date: 2023-04-25 10:32:20
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-04-25 10:53:30
+ * @LastEditTime: 2023-04-25 11:12:49
  * @Description: 审核人节点
 -->
 <template>
@@ -46,8 +46,9 @@
           </div>
         </div>
       </div>
-      <addNode :childNodeP.sync="nodeConfig.childNode"></addNode>
     </div>
+    <addNode :childNodeP.sync="nodeConfig.childNode"></addNode>
+  </div>
 </template>
 
 <script>
@@ -57,7 +58,6 @@ export default {
   data() {
     return {};
   },
-  
 };
 </script>
 

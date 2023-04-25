@@ -87,8 +87,8 @@ export default {
     addType(type) {
       this.visible = false;
       let data;
-      if (type != 4) {
-        if (type == 1) {
+      switch (type) {
+        case 1:
           data = {
             nodeName: "审核人",
             error: true,
@@ -103,7 +103,8 @@ export default {
             },
             childNode: this.childNodeP,
           };
-        } else if (type == 2) {
+          break;
+        case 2:
           data = {
             nodeName: "抄送人",
             error: true,
@@ -117,35 +118,36 @@ export default {
             },
             childNode: this.childNodeP,
           };
-        }
-        this.$parent.setPerson("", "", data, this.tip); //添加节点自动弹出弹框
-      } else {
-        data = {
-          nodeName: "路由",
-          type: 4,
-          nodeId: "conditionID",
-          childNode: this.childNodeP,
-          conditionNodes: [
-            {
-              nodeName: "条件1",
-              error: true,
-              type: 3,
-              priorityLevel: 1,
-              conditionList: [],
-              childNode: null,
-            },
-            {
-              nodeName: "默认",
-              error: true,
-              type: 3,
-              priorityLevel: 2,
-              conditionList: [],
-              childNode: null,
-            },
-          ],
-        };
-        this.$parent.setPerson(1, "", data); //添加节点自动弹出弹框
+          break;
+        case 4:
+          data = {
+            nodeName: "路由",
+            type: 4,
+            nodeId: "conditionID",
+            childNode: this.childNodeP,
+            conditionNodes: [
+              {
+                nodeName: "条件1",
+                error: true,
+                type: 3,
+                priorityLevel: 1,
+                conditionList: [],
+                childNode: null,
+              },
+              {
+                nodeName: "默认",
+                error: true,
+                type: 3,
+                priorityLevel: 2,
+                conditionList: [],
+                childNode: null,
+              },
+            ],
+          };
+          this.$parent.setPerson(1, "", data); //添加节点自动弹出弹框
+          break;
       }
+      type != 4 && this.$parent.setPerson("", "", data, this.tip); //添加节点自动弹出弹框
       this.$emit("update:childNodeP", data);
     },
   },
