@@ -2,8 +2,8 @@
  * @Author: 羊驼
  * @Date: 2023-04-25 14:33:54
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-04-25 15:46:51
- * @Description: file content
+ * @LastEditTime: 2023-04-25 16:08:08
+ * @Description: 流程图配置
  */
 import Vue from 'vue'
 // 生成的id不能重复！
@@ -17,6 +17,13 @@ const NodeType = {
     条件分支: 4,
     办理人: 5,
     结束: 6,
+    toString: (type) => {
+        for (let kv in this) {
+            if (kv == "toString") continue
+            if (this[kv] == type) return kv
+        }
+        return "未知类型"
+    }
 }
 
 /**
@@ -192,6 +199,7 @@ class TypeFactory {
 
 // 配置
 const FlowConfig = {
+
     // 创建节点后立即弹窗
     createPopupImmediately: false,
     // 各个类型标题的颜色
@@ -200,9 +208,37 @@ const FlowConfig = {
         [NodeType.审核人]: "rgb(230, 162, 60)",
         [NodeType.抄送人]: "rgb(72, 128, 255)",
         [NodeType.办理人]: "",
+        // 条件分支 没有颜色 可以无视
         [NodeType.条件分支]: "",
         [NodeType.结束]: "#8cafff",
-    }
+    },
+    // 生成添加按钮 popover 的显示
+    addNodesOptions: [
+        {
+            type: NodeType.审核人,
+            label: "审批人",
+            icon: "./img/审批人.png",
+            class: "approver",
+        },
+        {
+            type: NodeType.抄送人,
+            label: "抄送人",
+            icon: "./img/抄送人.png",
+            class: "notifier",
+        },
+        {
+            type: NodeType.办理人,
+            label: "办理人",
+            icon: "./img/抄送人.png",
+            class: "notifier",
+        },
+        {
+            type: NodeType.条件分支,
+            label: "条件分支",
+            icon: "./img/条件.png",
+            class: "condition",
+        }
+    ]
 }
 
 Vue.prototype.$nodeType = NodeType

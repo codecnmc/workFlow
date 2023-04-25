@@ -45,8 +45,9 @@ export default {
   },
   data() {
     return {
-      //流程设置
+      // 校验用
       isTried: false,
+      // 报错的数据
       tipList: [],
       nodeConfig: {
         error: true,
@@ -69,9 +70,9 @@ export default {
         { name: "地址", key: "adress" },
         { name: "状态", key: "state" },
       ],
+      // 缩放比例
       nowVal: 100,
-      flowPermission: [],
-      tableId: "",
+      // 暂时还不知道作用
       nodeConfigss: {
         type: 0, //类型
         priorityLevel: "", //优先级
@@ -90,6 +91,7 @@ export default {
       },
     };
   },
+  // 让子组件都能拿到根节点 方便计算
   provide() {
     return {
       getRoot: () => this.nodeConfig,
@@ -102,48 +104,44 @@ export default {
     };
   },
   methods: {
-    // 保存
+    // 保存前校验数据
     saveData() {
       this.isTried = true;
       this.tipList = [];
       this.reErr(this.nodeConfig);
-      if (this.tipList.length != 0) {
+      if (this.tipList.length > 0) {
         return;
       }
       this.workflowSave();
     },
+    // 递归检验error
     reErr(data) {
+      let nodeType = this.$nodeType;
       if (data.childNode) {
-        if (data.childNode.type == 1) {
-          //审批人
-          if (data.childNode.error) {
+        switch (data.childNode.type) {
+          case nodeType.开始:
+          case nodeType.审核人:
+          case nodeType.抄送人:
+          case nodeType.办理人:
+          case nodeType.结束:
             this.tipList.push({
               name: data.childNode.nodeName,
-              type: "审核人",
+              type: nodeType.toString(data.childNode.type),
             });
-          }
-          this.reErr(data.childNode);
-        } else if (data.childNode.type == 2) {
-          if (data.childNode.error) {
-            this.tipList.push({
-              name: data.childNode.nodeName,
-              type: "抄送人",
-            });
-          }
-          this.reErr(data.childNode);
-        } else if (data.childNode.type == 3) {
-          this.reErr(data.childNode.childNode);
-        } else if (data.childNode.type == 4) {
-          this.reErr(data.childNode);
-          for (var i = 0; i < data.childNode.conditionNodes.length; i++) {
-            if (data.childNode.conditionNodes[i].error) {
-              this.tipList.push({
-                name: data.childNode.conditionNodes[i].nodeName,
-                type: "条件",
-              });
+            this.reErr(data.childNode);
+            break;
+          case NodeType.条件分支:
+            this.reErr(data.childNode);
+            for (var i = 0; i < data.childNode.conditionNodes.length; i++) {
+              if (data.childNode.conditionNodes[i].error) {
+                this.tipList.push({
+                  name: data.childNode.conditionNodes[i].nodeName,
+                  type: "条件",
+                });
+              }
+              this.reErr(data.childNode.conditionNodes[i]);
             }
-            this.reErr(data.childNode.conditionNodes[i]);
-          }
+            break;
         }
       } else {
         data.childNode = null;
@@ -157,12 +155,14 @@ export default {
       }
       return data;
     },
+    // 校验通过后的操作
     workflowSave() {
       // 调接口存数据
       let data = this.handleData(this.nodeConfig);
       console.log("data", data);
       this.$message.success("保存成功");
     },
+    // 缩放比例调整
     zoomSize(type) {
       if (type == 1) {
         if (this.nowVal == 50) {

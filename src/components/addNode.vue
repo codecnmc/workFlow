@@ -8,56 +8,20 @@
       >
         <div class="add-node-popover-body">
           <div
-            class="add-node-popover-item approver"
-            @click="addType($nodeType.审核人)"
+            v-for="item in $flowConfig.addNodesOptions"
+            :key="item.type"
+            class="add-node-popover-item"
+            :class="item.class"
+            @click="addType(item.type)"
           >
             <div class="item-wrapper">
               <img
-                src="../assets/img/审批人.png"
+                :src="item.icon"
                 alt=""
                 class="img-style"
               >
             </div>
-            <p>审批人</p>
-          </div>
-          <div
-            class="add-node-popover-item notifier"
-            @click="addType($nodeType.抄送人)"
-          >
-            <div class="item-wrapper">
-              <img
-                src="../assets/img/抄送人.png"
-                alt=""
-                class="img-style"
-              >
-            </div>
-            <p>抄送人</p>
-          </div>
-          <div
-            class="add-node-popover-item notifier"
-            @click="addType($nodeType.办理人)"
-          >
-            <div class="item-wrapper">
-              <img
-                src="../assets/img/抄送人.png"
-                alt=""
-                class="img-style"
-              >
-            </div>
-            <p>办理人</p>
-          </div>
-          <div
-            class="add-node-popover-item condition"
-            @click="addType($nodeType.条件分支)"
-          >
-            <div class="item-wrapper">
-              <img
-                src="../assets/img/条件.png"
-                alt=""
-                class="img-style"
-              >
-            </div>
-            <p>条件分支</p>
+            <p>{{item.label}}</p>
           </div>
         </div>
         <button
@@ -80,6 +44,7 @@ export default {
   data() {
     return {
       visible: false,
+      nodes: [],
     };
   },
   methods: {
