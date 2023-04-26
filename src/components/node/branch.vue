@@ -2,7 +2,7 @@
  * @Author: 羊驼
  * @Date: 2023-04-25 10:57:30
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-04-26 10:12:06
+ * @LastEditTime: 2023-04-26 10:49:34
  * @Description: 分支情况
 -->
 <template>
@@ -34,7 +34,7 @@
               >
                 <div
                   class="sort-left"
-                  v-if="index != 0"
+                  v-if="index != 0 &&item.nodeName!='默认'"
                   @click.stop="arrTransfer(index, -1)"
                 >
                   &lt;
@@ -49,7 +49,7 @@
                 </div>
                 <div
                   class="sort-right"
-                  v-if=" index != nodeConfig.conditionNodes .length - 1 "
+                  v-if=" index != nodeConfig.conditionNodes .length - 1&&item.nodeName!='默认' "
                   @click.stop="arrTransfer(index)"
                 > &gt; </div>
                 <div class="content">
@@ -134,12 +134,30 @@ export default {
       }
       return 0;
     },
+    // 条件节点
+    conditions: {
+      get() {
+        return this.nodeConfig.conditionNodes;
+      },
+      set(value) {
+        this.nodeConfig.conditionNodes = value;
+      },
+    },
   },
   methods: {
+    // 设置条件的error状态
+    checkCondtions() {
+      for (var i = 0; i < this.conditions.length; i++) {
+        this.conditions[i].error =
+          this.conditionStr(this.conditions[i], i) == "请设置条件" &&
+          i != this.conditions.length - 1;
+      }
+    },
     //添加条件
     addTerm() {
-      let len = this.nodeConfig.conditionNodes.length;
-      this.nodeConfig.conditionNodes.push({
+      // 添加条件必须在默认前 否则影响判断
+      let len = this.conditions.length;
+      this.conditions.splice(len - 1, 0, {
         nodeName: "条件" + len,
         type: 3,
         priorityLevel: len + 1,
@@ -147,54 +165,49 @@ export default {
         childNode: null,
         nodeId: v4(),
       });
-      for (var i = 0; i < this.nodeConfig.conditionNodes.length; i++) {
-        this.nodeConfig.conditionNodes[i].error =
-          this.conditionStr(this.nodeConfig.conditionNodes[i], i) ==
-            "请设置条件" && i != this.nodeConfig.conditionNodes.length - 1;
-      }
+      this.checkCondtions();
     },
     // 调整条件位置
     arrTransfer(index, type = 1) {
-      // TODO 需要调整一下 默认情况是不能调整位置的 以及添加条件必须在默认前 否则影响判断
+      //  需要调整一下 默认情况是不能调整位置的
+      if (type == 1 && index + 1 == this.conditions.length - 1) {
+        return this.$message.error("无法移动到最后! 其他情况必须在最后");
+      }
       //向左-1,向右1
-      this.nodeConfig.conditionNodes[index] =
-        this.nodeConfig.conditionNodes.splice(
-          index + type,
-          1,
-          this.nodeConfig.conditionNodes[index]
-        )[0];
-      this.nodeConfig.conditionNodes.map((item, index) => {
+      this.conditions[index] = this.conditions.splice(
+        index + type,
+        1,
+        this.conditions[index]
+      )[0];
+      this.conditions.map((item, index) => {
         item.priorityLevel = index + 1;
       });
-      for (var i = 0; i < this.nodeConfig.conditionNodes.length; i++) {
-        this.nodeConfig.conditionNodes[i].error =
-          this.conditionStr(this.nodeConfig.conditionNodes[i], i) ==
-            "请设置条件" && i != this.nodeConfig.conditionNodes.length - 1;
-      }
+      this.checkCondtions();
     },
     //删除条件
     delTerm(index) {
-      this.nodeConfig.conditionNodes.splice(index, 1);
-      for (var i = 0; i < this.nodeConfig.conditionNodes.length; i++) {
-        this.nodeConfig.conditionNodes[i].error =
-          this.conditionStr(this.nodeConfig.conditionNodes[i], i) ==
-            "请设置条件" && i != this.nodeConfig.conditionNodes.length - 1;
+      let node = this.conditions[index];
+      if (this.conditions.length > 2 && node.nodeName == "默认") {
+        return this.$message.error("条件数量大于2的时候无法删除默认节点");
       }
+      this.conditions.splice(index, 1);
+      this.checkCondtions();
       if (this.nodeConfig.conditionNodes.length == 1) {
         if (this.nodeConfig.childNode) {
+          // 这句的意思是 当删除的长度为1的时候 代表整个条件节点给干掉了 要把数组第一位的链表续接到主分支下去
           if (this.nodeConfig.conditionNodes[0].childNode) {
             this.reData(
-              this.nodeConfig.conditionNodes[0].childNode,
+              this.conditions[0].childNode,
               this.nodeConfig.childNode
             );
           } else {
-            this.nodeConfig.conditionNodes[0].childNode =
-              this.nodeConfig.childNode;
+            this.conditions[0].childNode = this.nodeConfig.childNode;
           }
         }
-        this.$emit("input", this.nodeConfig.conditionNodes[0].childNode);
+        this.$emit("input", this.conditions[0].childNode);
       }
     },
+    // 递归续接链表
     reData(data, addData) {
       if (!data.childNode) {
         data.childNode = addData;

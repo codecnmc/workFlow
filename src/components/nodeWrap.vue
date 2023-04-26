@@ -72,6 +72,7 @@
   </div>
 </template>
 <script>
+// 是否 修改成导入配置形式?
 import addNode from "./addNode";
 import branch from "./node/branch.vue";
 import normal from "./node/normal.vue";

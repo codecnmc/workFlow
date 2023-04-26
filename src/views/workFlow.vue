@@ -129,41 +129,29 @@ export default {
       this.isTried = true;
       this.tipList = [];
       this.reErr(this.nodeConfig);
-      if (this.tipList.length > 0) {
-        return;
-      }
+      return this.tipList.length == 0;
     },
     // 递归检验error
     reErr(data) {
       let nodeType = this.$nodeType;
       if (data.childNode) {
-        switch (data.childNode.type) {
-          case nodeType.开始:
-          case nodeType.审核人:
-          case nodeType.抄送人:
-          case nodeType.办理人:
-          case nodeType.结束:
-            this.tipList.push({
-              name: data.childNode.nodeName,
-              type: nodeType.toString(data.childNode.type),
-            });
-            this.reErr(data.childNode);
-            break;
-          case nodeType.条件分支:
-            this.reErr(data.childNode);
-            for (var i = 0; i < data.childNode.conditionNodes.length; i++) {
-              if (data.childNode.conditionNodes[i].error) {
-                this.tipList.push({
-                  name: data.childNode.conditionNodes[i].nodeName,
-                  type: "条件",
-                });
-              }
-              this.reErr(data.childNode.conditionNodes[i]);
+        this.reErr(data.childNode);
+        if (data.childNode.type != nodeType.条件分支) {
+          this.tipList.push({
+            name: data.childNode.nodeName,
+            type: nodeType.toString(data.childNode.type),
+          });
+        } else {
+          for (var i = 0; i < data.childNode.conditionNodes.length; i++) {
+            if (data.childNode.conditionNodes[i].error) {
+              this.tipList.push({
+                name: data.childNode.conditionNodes[i].nodeName,
+                type: "条件",
+              });
             }
-            break;
+            this.reErr(data.childNode.conditionNodes[i]);
+          }
         }
-      } else {
-        data.childNode = null;
       }
     },
     // 缩放比例调整
