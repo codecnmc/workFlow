@@ -94,34 +94,58 @@ export default {
       // 获取根节点的数据
       getRoot: () => this.nodeConfig,
       // 平铺所有节点
-      getFlatRoot: () => {
-        let dic = {};
-        this.flatData(this.nodeConfig, dic);
-        return dic;
-      },
+      getFlatRoot: () => this.getFlatDic(),
+      findNode: this.findNode,
     };
   },
   beforeMount() {
     this.nodeConfig = {
       error: true,
-      childNode: this.$factory.getStruct(null, this.$nodeType.开始, null),
+      childNode: this.$factory.getStruct(null, this.$nodeType.开始, null, 1),
     };
+    this.nodeConfig.childNode.childNode = this.$factory.getStruct(
+      this.nodeConfig.childNode.nodeId,
+      this.$nodeType.结束,
+      null,
+      1
+    );
   },
   methods: {
+    // 查找节点
+    findNode(id) {
+      let dic = this.getFlatDic();
+      for (let kv in dic) {
+        if (kv == id) {
+          return dic[kv];
+        }
+      }
+    },
+    // 处理数组的问题 由于现在尾部缺失东西 导致会有点问题
+    conditionNodesHnalde(array, dic) {
+      array.forEach((node) => {
+        dic[node.nodeId] = node;
+        node.childNode && this.flatData(node.childNode, dic);
+      });
+    },
+    // 获取递归平铺字典
+    getFlatDic() {
+      let dic = {};
+      this.flatData(this.nodeConfig, dic);
+      return dic;
+    },
     // 递归平铺所有节点 方便于节点的操作
     flatData(data, dic) {
+      if (!data) return;
       if (data.childNode) {
         dic[data.childNode.nodeId] = data.childNode;
-        if (
-          data.childNode.conditionNodes &&
-          data.childNode.conditionNodes.length > 0
-        ) {
-          data.childNode.conditionNodes.forEach((node) => {
-            dic[node.nodeId] = node;
-            node.childNode && this.flatData(data.childNode, dic);
-          });
-        }
         this.flatData(data.childNode, dic);
+        data.childNode.conditionNodes &&
+          data.childNode.conditionNodes.length > 0 &&
+          this.conditionNodesHnalde(data.childNode.conditionNodes, dic);
+      }
+      if (data.conditionNodes && data.conditionNodes.length > 0) {
+        dic[data.nodeId] = data;
+        this.conditionNodesHnalde(data.conditionNodes, dic);
       }
     },
     // 保存前校验数据
@@ -217,6 +241,7 @@ export default {
 .approval-flow {
   .dingflow-design {
     padding-top: 20px;
+    padding-bottom: 100px;
     .box-scale {
       transform: scale(1);
       display: inline-block;

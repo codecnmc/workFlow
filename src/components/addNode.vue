@@ -67,19 +67,47 @@ export default {
       this.visible = false;
       // 判断这个节点是不是判断节点 不能嵌套太多层条件 否则会出问题
       // console.log(this.nodeConfig);
+      let level = this.nodeConfig.level;
+      if (type == this.$nodeType.条件分支) {
+        level += 1;
+        if (level > 2) {
+          this.nodeConfig.childNode = this.$factory.getStruct(
+            this.nodeConfig && this.nodeConfig.nodeId,
+            this.$nodeType.分支跳点,
+            null,
+            level
+          );
+        }
+        if (level >= this.$flowConfig.conditionNestCount + 2) {
+          return this.$message.error("已超过最大嵌套限制数量");
+        }
+      }
+
       let data = this.$factory.getStruct(
         this.nodeConfig && this.nodeConfig.nodeId,
         type,
-        null
+        null,
+        level
       );
+
+      // 解决条件嵌套导向的问题
       if (this.$flowConfig.createPopupImmediately) {
         //添加节点自动弹出弹框
         type != 4
           ? this.$parent.setPerson("", "", data, this.tip)
           : this.$parent.setPerson(1, "", data);
       }
-      this.nodeConfig.childNode = data;
-      // this.$emit("update:childNodeP", data);
+
+      // 修改原来添加的逻辑 他是直接覆盖下一节点 而不是链表链接
+      if (this.nodeConfig.childNode) {
+        let temp = this.nodeConfig.childNode;
+        this.nodeConfig.childNode = data;
+        temp.fatherID = data.nodeId;
+        data.childNode = temp;
+      } else {
+        this.nodeConfig.childNode = data;
+      }
+
     },
   },
 };

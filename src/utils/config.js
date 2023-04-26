@@ -2,7 +2,7 @@
  * @Author: 羊驼
  * @Date: 2023-04-25 14:33:54
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-04-26 09:53:36
+ * @LastEditTime: 2023-04-26 17:34:33
  * @Description: 流程图配置
  */
 import Vue from 'vue'
@@ -17,6 +17,7 @@ const NodeType = {
     条件分支: 4,
     办理人: 5,
     结束: 6,
+    分支跳点: 7,  // 跳出这次if else 回到主分支继续走
     toString: (type) => {
         for (let kv in this) {
             if (kv == "toString") continue
@@ -38,9 +39,9 @@ class TypeFactory {
    * @param {*}
    * @return {*}
    */
-    getStruct(fatherID, type, childNode) {
+    getStruct(fatherID, type, childNode, level, priorityLevel) {
         if (this.dic[type]) {
-            return this.dic[type](fatherID, childNode)
+            return this.dic[type](fatherID, childNode, level, level, priorityLevel)
         } else {
             throw Error("无效type类型:" + type)
         }
@@ -52,8 +53,25 @@ class TypeFactory {
         [NodeType.审核人]: this.auditType,
         [NodeType.抄送人]: this.carbonCopyType,
         [NodeType.办理人]: this.executeType,
+        [NodeType.条件]: this.conditionType,
         [NodeType.条件分支]: this.branchType,
         [NodeType.结束]: this.endType,
+        [NodeType.分支跳点]: this.skipType,
+    }
+
+    /**
+     * @description: 跳点结构
+     * @param {*}
+     * @return {*}
+     */
+    skipType(fatherID, childNode, level) {
+        return {
+            error: false,
+            nodeId: v4(),
+            childNode,
+            fatherID,
+            level
+        }
     }
 
 
@@ -62,7 +80,7 @@ class TypeFactory {
      * @param {*}
      * @return {*}
      */
-    startType(fatherID, childNode) {
+    startType(fatherID, childNode, level) {
         return {
             nodeName: "开始",
             error: true,
@@ -75,7 +93,8 @@ class TypeFactory {
                 valueList: [],
             },
             childNode,
-            fatherID
+            fatherID,
+            level
         }
     }
 
@@ -84,7 +103,7 @@ class TypeFactory {
      * @param {*}
      * @return {*}
      */
-    endType(fatherID, childNode) {
+    endType(fatherID, childNode, level) {
         return {
             nodeName: "结束",
             error: true,
@@ -97,8 +116,8 @@ class TypeFactory {
                 valueList: [],
             },
             childNode,
-            fatherID
-
+            fatherID,
+            level
         }
     }
 
@@ -107,7 +126,7 @@ class TypeFactory {
      * @param {*}
      * @return {*}
      */
-    executeType(fatherID, childNode) {
+    executeType(fatherID, childNode, level) {
         return {
             nodeName: "办理人",
             error: true,
@@ -120,7 +139,8 @@ class TypeFactory {
                 valueList: [],
             },
             childNode,
-            fatherID
+            fatherID,
+            level
 
         }
     }
@@ -130,7 +150,7 @@ class TypeFactory {
      * @param {*}
      * @return {*}
      */
-    auditType(fatherID, childNode) {
+    auditType(fatherID, childNode, level) {
         return {
             nodeName: "审核人",
             error: true,
@@ -144,7 +164,8 @@ class TypeFactory {
                 valueName: "",
             },
             childNode,
-            fatherID
+            fatherID,
+            level
 
         }
     }
@@ -154,7 +175,7 @@ class TypeFactory {
      * @param {*}
      * @return {*}
      */
-    carbonCopyType(fatherID, childNode) {
+    carbonCopyType(fatherID, childNode, level) {
         return {
             nodeName: "抄送人",
             error: true,
@@ -167,8 +188,8 @@ class TypeFactory {
                 valueList: [],
             },
             childNode,
-            fatherID
-
+            fatherID,
+            level
         }
     }
 
@@ -177,33 +198,39 @@ class TypeFactory {
      * @param {*}
      * @return {*}
      */
-    branchType(fatherID, childNode) {
+    branchType(fatherID, childNode, level) {
+        let nodeId = v4()
         return {
             nodeName: "路由",
             type: NodeType.条件分支,
-            nodeId: v4(),
+            nodeId,
             childNode,
             fatherID,
             conditionNodes: [
-                {
-                    nodeName: "条件1",
-                    error: true,
-                    nodeId: v4(),
-                    type: NodeType.条件,
-                    priorityLevel: 1,
-                    conditionList: [],
-                    childNode: null,
-                },
-                {
-                    nodeName: "默认",
-                    error: true,
-                    type: NodeType.条件,
-                    nodeId: v4(),
-                    priorityLevel: 2,
-                    conditionList: [],
-                    childNode: null,
-                },
-            ]
+                this[NodeType.条件](nodeId, null, level, 1),
+                this[NodeType.条件](nodeId, null, level, 0),
+            ],
+            level
+        }
+    }
+
+    /**
+     * @description: 条件数据结构
+     * @param {*}
+     * @return {*}
+     */
+    conditionType(fatherID, childNode, level, priorityLevel) {
+        let nodeName = !priorityLevel ? "默认" : "条件" + priorityLevel
+        return {
+            nodeName,
+            error: true,
+            nodeId: v4(),
+            type: NodeType.条件,
+            priorityLevel,
+            conditionList: [],
+            childNode,
+            fatherID,
+            level
         }
     }
 
@@ -250,7 +277,8 @@ const FlowConfig = {
             icon: "./img/条件.png",
             class: "condition",
         }
-    ]
+    ],
+    conditionNestCount: 2,  // 允许条件嵌套数量
 }
 
 Vue.prototype.$nodeType = NodeType

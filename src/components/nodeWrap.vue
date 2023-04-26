@@ -7,7 +7,7 @@
       v-model="nodeConfig"
     />
     <nodeWrap
-      v-if="nodeConfig.childNode && nodeConfig.childNode"
+      v-if="nodeConfig.childNode"
       v-model="nodeConfig.childNode"
       :isTried.sync="isTried"
     ></nodeWrap>
@@ -160,6 +160,10 @@ export default {
           return "conditionForm";
       }
     },
+  },
+  mounted() {
+    // 检测这个节点是不是结束
+
   },
   methods: {
     //修改节点name

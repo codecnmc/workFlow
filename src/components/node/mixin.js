@@ -2,7 +2,7 @@
  * @Author: 羊驼
  * @Date: 2023-04-25 10:34:46
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-04-26 10:18:56
+ * @LastEditTime: 2023-04-26 17:27:06
  * @Description: file content
  */
 import addNode from "../addNode";
@@ -18,7 +18,7 @@ export default {
         event: "input"
     },
     emits: ["openDrawer"],
-    inject: ["setApproverStr", "conditionStr", "getRoot", "getFlatRoot"],
+    inject: ["setApproverStr", "conditionStr", "getFlatRoot"],
     computed: {
         nodeConfig: {
             get() {
@@ -52,8 +52,11 @@ export default {
                 }
                 break;
         }
+        this.init()
     },
     methods: {
+        // 可能需要mounted初始化
+        init() { },
         // 删除节点
         delNode() {
             let fatherID = this.nodeConfig.fatherID

@@ -2,7 +2,7 @@
  * @Author: 羊驼
  * @Date: 2023-04-25 10:32:20
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-04-26 09:28:29
+ * @LastEditTime: 2023-04-26 17:39:24
  * @Description: 审核人节点
 -->
 <template>
@@ -10,6 +10,7 @@
     <div
       class="node-wrap-box"
       v-if="nodeConfig"
+      :style="`margin-left:${offset}`"
       :class="(isTried && nodeConfig.error ? 'active error' : '') "
     >
       <div @click="setPerson">
@@ -46,7 +47,11 @@
         </div>
       </div>
     </div>
-    <addNode v-model="nodeConfig"></addNode>
+    <addNode
+      v-model="nodeConfig"
+      :style="`margin-left:${offset}`"
+      v-if="nodeConfig.type!=$nodeType.结束"
+    ></addNode>
   </div>
 </template>
 
@@ -54,8 +59,33 @@
 import mixin from "./mixin";
 export default {
   mixins: [mixin],
-  data() {
-    return {};
+  computed: {
+    offset() {
+      let maxLevel = 1;
+      let dic = this.getFlatRoot();
+      for (let kv in dic) {
+        maxLevel = Math.max(maxLevel, dic[kv].level);
+      }
+      let level = maxLevel - 2;
+      if (this.nodeConfig.type == this.$nodeType.结束) {
+        // 偏移懒得算 有需求可以自己加
+        switch (level) {
+          case 1:
+            return "190px";
+          case 2:
+            return "500px";
+          default:
+            return "0px";
+        }
+      }
+      if (this.nodeConfig.level > 2) {
+        return "240px";
+      }
+      if(level>0){
+        return "180px"
+      }
+      return "0px";
+    },
   },
 };
 </script>

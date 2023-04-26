@@ -2,7 +2,7 @@
  * @Author: 羊驼
  * @Date: 2023-04-25 10:57:30
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-04-26 10:49:34
+ * @LastEditTime: 2023-04-26 17:04:17
  * @Description: 分支情况
 -->
 <template>
@@ -45,6 +45,7 @@
                   <i
                     class="el-icon-close close"
                     @click.stop="delTerm(index)"
+                    v-if="item.nodeName!='默认'"
                   ></i>
                 </div>
                 <div
@@ -104,19 +105,22 @@
 
 <script>
 import mixin from "./mixin";
-import { v4 } from "uuid";
-
 export default {
   mixins: [mixin],
   computed: {
     // 条件分支偏移量
     condtionsOffset() {
       let nodeLength = this.nodeConfig.conditionNodes.length;
-      // 1080p下 五个极限了 再靠左就遮住了 所以往右偏移一点
+      let offset = 0;
+      let count = this.nodeConfig.level - 2;
+      offset = 240 * count;
       if (nodeLength > 5) {
-        return -240 - 3 * 190 + "px";
+        // 1080p下 五个极限了 再靠左就遮住了 所以往右偏移一点
+        return -240 - 3 * 190 + offset + "px";
       }
-      return -240 - (this.nodeConfig.conditionNodes.length - 2) * 190 + "px";
+      return (
+        -240 - (this.nodeConfig.conditionNodes.length - 2) * 190 + offset + "px"
+      );
     },
     // 条件分支添加条件按钮偏移量
     conditionButtonOffset() {
@@ -157,14 +161,17 @@ export default {
     addTerm() {
       // 添加条件必须在默认前 否则影响判断
       let len = this.conditions.length;
-      this.conditions.splice(len - 1, 0, {
-        nodeName: "条件" + len,
-        type: 3,
-        priorityLevel: len + 1,
-        conditionList: [],
-        childNode: null,
-        nodeId: v4(),
-      });
+      this.conditions.splice(
+        len - 1,
+        0,
+        this.$factory.getStruct(
+          this.nodeConfig.nodeId,
+          this.$nodeType.条件,
+          null,
+          this.nodeConfig.level,
+          len
+        )
+      );
       this.checkCondtions();
     },
     // 调整条件位置
