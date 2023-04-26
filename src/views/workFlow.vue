@@ -94,7 +94,7 @@ export default {
   beforeMount() {
     this.nodeConfig = {
       error: true,
-      childNode: this.$factory.getStruct(this.$nodeType.开始, null),
+      childNode: this.$factory.getStruct(null, this.$nodeType.开始, null),
     };
   },
   methods: {
@@ -141,19 +141,10 @@ export default {
         data.childNode = null;
       }
     },
-    // 给数据加preId(递归)
-    handleData(data) {
-      if (data.childNode) {
-        data.childNode.preId = data.nodeId;
-        this.handleData(data.childNode);
-      }
-      return data;
-    },
     // 校验通过后的操作
     workflowSave() {
       // 调接口存数据
-      let data = this.handleData(this.nodeConfig);
-      console.log("data", data);
+      console.log("data", this.nodeConfig);
       this.$message.success("保存成功");
     },
     // 缩放比例调整

@@ -2,7 +2,7 @@
  * @Author: 羊驼
  * @Date: 2023-04-25 10:57:30
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-04-25 17:02:52
+ * @LastEditTime: 2023-04-26 09:28:22
  * @Description: 分支情况
 -->
 <template>
@@ -66,7 +66,7 @@
                 </div>
               </div>
               <addNode
-                :childNodeP.sync="item.childNode"
+                v-model="nodeConfig"
                 :tip="'条件'"
               ></addNode>
             </div>
@@ -95,7 +95,7 @@
         </div>
       </div>
       <addNode
-        :childNodeP.sync="nodeConfig.childNode"
+        v-model="nodeConfig"
         :style="`margin-left:${condtionAddButton}`"
       ></addNode>
     </div>

@@ -2,7 +2,7 @@
  * @Author: 羊驼
  * @Date: 2023-04-25 10:32:20
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-04-25 15:45:04
+ * @LastEditTime: 2023-04-26 09:28:29
  * @Description: 审核人节点
 -->
 <template>
@@ -46,7 +46,7 @@
         </div>
       </div>
     </div>
-    <addNode :childNodeP.sync="nodeConfig.childNode"></addNode>
+    <addNode v-model="nodeConfig"></addNode>
   </div>
 </template>
 

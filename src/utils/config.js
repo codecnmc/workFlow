@@ -2,7 +2,7 @@
  * @Author: 羊驼
  * @Date: 2023-04-25 14:33:54
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-04-25 16:08:08
+ * @LastEditTime: 2023-04-26 09:31:27
  * @Description: 流程图配置
  */
 import Vue from 'vue'
@@ -38,9 +38,9 @@ class TypeFactory {
    * @param {*}
    * @return {*}
    */
-    getStruct(type, childNode) {
+    getStruct(fatherID, type, childNode) {
         if (this.dic[type]) {
-            return this.dic[type](childNode)
+            return this.dic[type](fatherID, childNode)
         } else {
             throw Error("无效type类型:" + type)
         }
@@ -62,7 +62,7 @@ class TypeFactory {
      * @param {*}
      * @return {*}
      */
-    startType(childNode) {
+    startType(fatherID, childNode) {
         return {
             nodeName: "开始",
             error: true,
@@ -75,6 +75,7 @@ class TypeFactory {
                 valueList: [],
             },
             childNode,
+            fatherID
         }
     }
 
@@ -83,7 +84,7 @@ class TypeFactory {
      * @param {*}
      * @return {*}
      */
-    endType(childNode) {
+    endType(fatherID, childNode) {
         return {
             nodeName: "结束",
             error: true,
@@ -96,6 +97,8 @@ class TypeFactory {
                 valueList: [],
             },
             childNode,
+            fatherID
+
         }
     }
 
@@ -104,7 +107,7 @@ class TypeFactory {
      * @param {*}
      * @return {*}
      */
-    executeType(childNode) {
+    executeType(fatherID, childNode) {
         return {
             nodeName: "办理人",
             error: true,
@@ -117,6 +120,8 @@ class TypeFactory {
                 valueList: [],
             },
             childNode,
+            fatherID
+
         }
     }
 
@@ -125,7 +130,7 @@ class TypeFactory {
      * @param {*}
      * @return {*}
      */
-    auditType(childNode) {
+    auditType(fatherID, childNode) {
         return {
             nodeName: "审核人",
             error: true,
@@ -139,6 +144,8 @@ class TypeFactory {
                 valueName: "",
             },
             childNode,
+            fatherID
+
         }
     }
 
@@ -147,7 +154,7 @@ class TypeFactory {
      * @param {*}
      * @return {*}
      */
-    carbonCopyType(childNode) {
+    carbonCopyType(fatherID, childNode) {
         return {
             nodeName: "抄送人",
             error: true,
@@ -160,6 +167,8 @@ class TypeFactory {
                 valueList: [],
             },
             childNode,
+            fatherID
+
         }
     }
 
@@ -168,12 +177,13 @@ class TypeFactory {
      * @param {*}
      * @return {*}
      */
-    branchType(childNode) {
+    branchType(fatherID, childNode) {
         return {
             nodeName: "路由",
             type: NodeType.条件分支,
             nodeId: v4(),
             childNode,
+            fatherID,
             conditionNodes: [
                 {
                     nodeName: "条件1",

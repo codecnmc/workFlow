@@ -40,26 +40,46 @@
 </template>
 <script>
 export default {
-  props: ["childNodeP", "nodeConfig", "tip"],
+  props: ["value", "tip"],
   data() {
     return {
       visible: false,
       nodes: [],
     };
   },
+  model: {
+    prop: "value",
+    event: "input",
+  },
+  computed: {
+    nodeConfig: {
+      get() {
+        return this.value;
+      },
+      set(value) {
+        this.$emit("input", value);
+      },
+    },
+  },
   methods: {
     // 新增类型
     addType(type) {
       this.visible = false;
       // 判断这个节点是不是判断节点 不能嵌套太多层条件 否则会出问题
-      let data = this.$factory.getStruct(type, this.childNodeP);
+      // console.log(this.nodeConfig);
+      let data = this.$factory.getStruct(
+        this.nodeConfig && this.nodeConfig.nodeId,
+        type,
+        null
+      );
       if (this.$flowConfig.createPopupImmediately) {
         //添加节点自动弹出弹框
         type != 4
           ? this.$parent.setPerson("", "", data, this.tip)
           : this.$parent.setPerson(1, "", data);
       }
-      this.$emit("update:childNodeP", data);
+      this.nodeConfig.childNode = data;
+      // this.$emit("update:childNodeP", data);
     },
   },
 };
