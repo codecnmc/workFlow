@@ -2,7 +2,7 @@
  * @Author: 羊驼
  * @Date: 2023-04-25 14:33:54
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-04-26 09:31:27
+ * @LastEditTime: 2023-04-26 09:53:36
  * @Description: 流程图配置
  */
 import Vue from 'vue'
@@ -188,6 +188,7 @@ class TypeFactory {
                 {
                     nodeName: "条件1",
                     error: true,
+                    nodeId: v4(),
                     type: NodeType.条件,
                     priorityLevel: 1,
                     conditionList: [],
@@ -197,6 +198,7 @@ class TypeFactory {
                     nodeName: "默认",
                     error: true,
                     type: NodeType.条件,
+                    nodeId: v4(),
                     priorityLevel: 2,
                     conditionList: [],
                     childNode: null,

@@ -2,7 +2,7 @@
  * @Author: 羊驼
  * @Date: 2023-04-25 10:34:46
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-04-25 17:07:09
+ * @LastEditTime: 2023-04-26 10:18:56
  * @Description: file content
  */
 import addNode from "../addNode";
@@ -18,7 +18,7 @@ export default {
         event: "input"
     },
     emits: ["openDrawer"],
-    inject: ["setApproverStr", "conditionStr", "getRoot"],
+    inject: ["setApproverStr", "conditionStr", "getRoot", "getFlatRoot"],
     computed: {
         nodeConfig: {
             get() {
@@ -56,25 +56,20 @@ export default {
     methods: {
         // 删除节点
         delNode() {
+            let fatherID = this.nodeConfig.fatherID
+            // 还需要更换fatherID 否则删除的时候还会找旧的father节点 如果旧节点被删了呢
             if (this.nodeConfig.childNode) {
+                this.nodeConfig.childNode.fatherID = fatherID
                 this.$emit("input", this.nodeConfig.childNode)
             } else {
                 // 处理没有下级的情况 需要拿到Root根节点数据向下找 如果他没上级不操作 有上级移除本级
-                let root = this.getRoot()
-                let compareID = this.nodeConfig.nodeId
-                let last = null
-                // 还有一种情况 就是在条件分支下的节点
-                while (root.childNode) {
-                    if (root.childNode.nodeId == compareID && !last) {
-                        throw Error("不能删除第一个节点")
-                    }
-                    let childID = root.childNode.nodeId
-                    if (childID == compareID) {
-                        root.childNode = null
-                        break;
-                    }
-                    last = root
-                    root = root.childNode
+                // 改成平铺后处理就方便了
+                let flatRoot = this.getFlatRoot()
+                if (!fatherID) {
+                    throw Error("这个是根节点无法删除！")
+                } else {
+                    let father = flatRoot[fatherID]
+                    father.childNode = null
                 }
             }
         },

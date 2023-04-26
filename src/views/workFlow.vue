@@ -4,17 +4,19 @@
       <el-button
         type="primary"
         class="btn-style"
-        @click="saveData"
-      >保存</el-button>
+        @click="validate"
+      >校验</el-button>
       <div class="zoom flex">
         <div
-          :class="'zoom-out'+ (nowVal==50?' disabled':'')"
-          @click="zoomSize(1)"
+          class="zoom-out"
+          :class="{'disabled':nowVal==50}"
+          @click="zoomSize(0)"
         ></div>
         <span>{{nowVal}}%</span>
         <div
-          :class="'zoom-in'+ (nowVal==300?' disabled':'')"
-          @click="zoomSize(2)"
+          class="zoom-in"
+          :class="{'disabled':nowVal==300}"
+          @click="zoomSize(1)"
         ></div>
       </div>
     </div>
@@ -48,6 +50,7 @@ export default {
       isTried: false,
       // 报错的数据
       tipList: [],
+      // 展示节点结构 初始化会更换为开始节点
       nodeConfig: {
         error: true,
         childNode: {
@@ -88,7 +91,14 @@ export default {
   // 让子组件都能拿到根节点 方便计算
   provide() {
     return {
+      // 获取根节点的数据
       getRoot: () => this.nodeConfig,
+      // 平铺所有节点
+      getFlatRoot: () => {
+        let dic = {};
+        this.flatData(this.nodeConfig, dic);
+        return dic;
+      },
     };
   },
   beforeMount() {
@@ -98,15 +108,30 @@ export default {
     };
   },
   methods: {
+    // 递归平铺所有节点 方便于节点的操作
+    flatData(data, dic) {
+      if (data.childNode) {
+        dic[data.childNode.nodeId] = data.childNode;
+        if (
+          data.childNode.conditionNodes &&
+          data.childNode.conditionNodes.length > 0
+        ) {
+          data.childNode.conditionNodes.forEach((node) => {
+            dic[node.nodeId] = node;
+            node.childNode && this.flatData(data.childNode, dic);
+          });
+        }
+        this.flatData(data.childNode, dic);
+      }
+    },
     // 保存前校验数据
-    saveData() {
+    validate() {
       this.isTried = true;
       this.tipList = [];
       this.reErr(this.nodeConfig);
       if (this.tipList.length > 0) {
         return;
       }
-      this.workflowSave();
     },
     // 递归检验error
     reErr(data) {
@@ -124,7 +149,7 @@ export default {
             });
             this.reErr(data.childNode);
             break;
-          case NodeType.条件分支:
+          case nodeType.条件分支:
             this.reErr(data.childNode);
             for (var i = 0; i < data.childNode.conditionNodes.length; i++) {
               if (data.childNode.conditionNodes[i].error) {
@@ -141,23 +166,12 @@ export default {
         data.childNode = null;
       }
     },
-    // 校验通过后的操作
-    workflowSave() {
-      // 调接口存数据
-      console.log("data", this.nodeConfig);
-      this.$message.success("保存成功");
-    },
     // 缩放比例调整
     zoomSize(type) {
-      if (type == 1) {
-        if (this.nowVal == 50) {
-          return;
-        }
+      let value = this.nowVal;
+      if (!type && value > 50) {
         this.nowVal -= 10;
-      } else {
-        if (this.nowVal == 300) {
-          return;
-        }
+      } else if (type && value < 300) {
         this.nowVal += 10;
       }
     },

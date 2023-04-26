@@ -2,7 +2,7 @@
  * @Author: 羊驼
  * @Date: 2023-04-25 10:57:30
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-04-26 09:28:22
+ * @LastEditTime: 2023-04-26 10:12:06
  * @Description: 分支情况
 -->
 <template>
@@ -66,13 +66,13 @@
                 </div>
               </div>
               <addNode
-                v-model="nodeConfig"
+                v-model="nodeConfig.conditionNodes[index]"
                 :tip="'条件'"
               ></addNode>
             </div>
           </div>
           <nodeWrap
-            v-if="item.childNode && item.childNode"
+            v-if="item.childNode"
             v-model="item.childNode"
             :isTried.sync="isTried"
           ></nodeWrap>
@@ -104,6 +104,8 @@
 
 <script>
 import mixin from "./mixin";
+import { v4 } from "uuid";
+
 export default {
   mixins: [mixin],
   computed: {
@@ -143,6 +145,7 @@ export default {
         priorityLevel: len + 1,
         conditionList: [],
         childNode: null,
+        nodeId: v4(),
       });
       for (var i = 0; i < this.nodeConfig.conditionNodes.length; i++) {
         this.nodeConfig.conditionNodes[i].error =
