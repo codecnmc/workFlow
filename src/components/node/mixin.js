@@ -2,7 +2,7 @@
  * @Author: 羊驼
  * @Date: 2023-04-25 10:34:46
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-04-27 16:07:26
+ * @LastEditTime: 2023-04-27 16:57:30
  * @Description: file content
  */
 import addNode from "../addNode";
@@ -33,17 +33,21 @@ export default {
         if (this.value == undefined) {
             throw Error("无绑定v-model 请绑定")
         }
-        this.setApproverStr()
+        let str = this.setApproverStr()
+        if (this.nodeConfig.type != this.$nodeType.条件分支) {
+            this.nodeConfig.error = str == ""
+        }
     },
     methods: {
         placeholderList() {
             return this.$nodeType.toString(this.nodeConfig.type)
         },
         setApproverStr() {
-            this.nodeConfig.error == this.$factory.getTypeTextHandle(
+            let str = this.$factory.getTypeTextHandle(
                 this.nodeConfig.type,
                 this.nodeConfig
-            ) == "";
+            )
+            return str
         },
         setConditionStr(item) {
             let str = this.$factory.getTypeTextHandle(

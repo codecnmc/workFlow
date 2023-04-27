@@ -2,7 +2,7 @@
  * @Author: 羊驼
  * @Date: 2023-04-27 11:47:24
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-04-27 15:26:41
+ * @LastEditTime: 2023-04-27 17:04:38
  * @Description: 节点编辑器
 -->
 <template>
@@ -12,7 +12,6 @@
     append-to-body
     direction="rtl"
     size="560px"
-    :before-close="saveApprover"
   >
     <template v-if="approverConfig">
       <div
@@ -68,12 +67,14 @@
 
 <script>
 export default {
+  inject: ["findNode", "useroptions", "directorLevelList"],
   computed: {
     // 获取表单组件
     getFormComponent() {
       if (!this.approverConfig) return;
       return this.$factory.getFormComponentName(this.approverConfig.type);
     },
+    // 默认条件表单
     defaultApprovalDrawer() {
       return this.approverConfig.nodeName == "默认";
     },
@@ -81,21 +82,16 @@ export default {
   data() {
     return {
       approverDrawer: false, //审批弹框
-      conditionDrawer: false, //条件弹框
-
       //审批弹框字段Obj
       approverConfig: {},
-
-      hasFlag: false,
-      conditionTip: "",
-      // 当前编辑节点的id
-      currentID: "",
+      // 处理节点名称更改的标志位
       titleInputFlag: false,
       // 更改的节点名称
       nodeName: "",
     };
   },
   methods: {
+    // 显示input框 以及校验输入
     clickEdit() {
       this.titleInputFlag = !this.titleInputFlag;
       if (!this.titleInputFlag && this.nodeName == "默认") {
@@ -108,16 +104,121 @@ export default {
     setApproverStr() {
       return this.$factory.getTypeTextHandle(
         this.approverConfig.type,
-        this.nodeConfig
+        this.approverConfig
       );
     },
     //保存弹框设置
     saveApprover() {
+      let nodeType = this.$nodeType;
       this.approverDrawer = false;
+      if (this.approverConfig.type === nodeType.条件) {
+        return this.saveCondition();
+      }
+      let list = this.approverConfig.nodeUserType.valueList;
+      let nameList = []; // 下拉框:审批角色是name，指定用户是userName
+      if (list.length > 0) {
+        this.useroptions.forEach((item) => {
+          list.forEach((i) => {
+            if (this.approverConfig.nodeUserType.type === "role") {
+              if (item.id === i) nameList.push(item.name);
+            }
+            if (this.approverConfig.nodeUserType.type === "user") {
+              if (item.id === i) nameList.push(item.userName);
+            }
+          });
+        });
+        this.approverConfig.nodeUserType.value = list.join(",");
+        this.approverConfig.nodeUserType.valueName = nameList.join(",");
+      } else if (this.approverConfig.nodeUserType.type !== "manager") {
+        this.approverConfig.nodeUserType.value = "";
+        this.approverConfig.nodeUserType.valueName = "";
+      }
+      if (this.approverConfig.nodeUserType.type === "manager") {
+        //抄送 、审批人逐级审批
+        if (
+          [nodeType.审核人, nodeType.抄送人].includes(this.approverConfig.type)
+        ) {
+          let num = this.approverConfig.nodeUserType.value;
+          if (num.indexOf("m") !== -1) {
+            num = num.substring(2);
+          }
+          // 默认值
+          if (
+            this.approverConfig.type === nodeType.审核人 &&
+            this.approverConfig.nodeUserType.type == "manager" &&
+            !this.approverConfig.nodeUserType.value
+          ) {
+            this.approverConfig.nodeUserType.value = "主管";
+          }
+        } else {
+          this.approverConfig.nodeUserType.value = "主管";
+        }
+      }
+      this.approverConfig.error = this.setApproverStr() === "";
+      this.saveData();
     },
     //保存条件设置
     saveCondition() {
       this.approverDrawer = false;
+      let conditionString = ""; // 后端要的数据
+      let conditionStringName = ""; //前端显示
+      //条件循环设置
+      if (this.approverConfig.conditionList.length > 0) {
+        this.approverConfig.conditionList.forEach((item, indx) => {
+          if (
+            item.conditionChildrenNodes &&
+            item.conditionChildrenNodes.length > 0
+          ) {
+            item.conditionChildrenNodes.forEach((it, ind) => {
+              conditionString =
+                conditionString +
+                it.conditionOperator +
+                it.leftFileds +
+                it.centerFileds +
+                it.rightFileds;
+              conditionStringName =
+                conditionStringName +
+                it.conditionOperator +
+                it.leftFiledsName +
+                it.centerFileds +
+                it.rightFileds;
+            });
+          }
+          conditionString = conditionString + item.conditionGroupOperator;
+          conditionStringName =
+            conditionStringName + item.conditionGroupOperator;
+        });
+      }
+      this.approverConfig.conditionString = conditionString;
+      this.approverConfig.conditionStringName = conditionStringName;
+      this.approverConfig.error =
+        this.$factory.getTypeTextHandle(
+          this.approverConfig.type,
+          this.approverConfig
+        ) == "请设置条件";
+      this.saveData();
+    },
+    saveData() {
+      let node = this.findNode(this.approverConfig.nodeId);
+      if (!node) {
+        throw Error("无效节点对象");
+      }
+      for (let kv in this.approverConfig) {
+        if (
+          [
+            "nodeName",
+            "nodeId",
+            "childNode",
+            "type",
+            "fatherID",
+            "conditionNodes",
+            "level",
+          ].includes(kv)
+        )
+          continue;
+        node[kv] = this.approverConfig[kv];
+      }
+      node.nodeName = this.nodeName;
     },
     //打开弹框
     openDrawer(data) {
@@ -132,154 +233,4 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.flex {
-  display: flex;
-}
-.edit_button {
-  margin-left: 10px;
-}
-//弹框
-.set_promoter {
-  .el-drawer__header {
-    margin-bottom: 0;
-    padding: 0 24px;
-    border-bottom: 1px solid #ebebeb;
-
-    .title {
-      height: 40px;
-      line-height: 40px;
-      font-size: 20px;
-      color: #333;
-      justify-content: flex-start;
-
-      i {
-        margin-left: 8px;
-        font-size: 30px;
-      }
-      .el-input {
-        width: 80%;
-      }
-    }
-  }
-
-  .el-drawer__body {
-    overflow-y: auto;
-    max-height: calc(100% - 64px);
-    padding-bottom: 80px;
-  }
-
-  .drawer-content {
-    padding: 0 24px;
-
-    /deep/ .el-radio {
-      margin-bottom: 16px;
-
-      .mark {
-        color: #828282;
-      }
-
-      &.is-checked {
-        .mark {
-          color: #4880ff;
-        }
-      }
-
-      &:last-child {
-        margin-bottom: 0;
-      }
-    }
-  }
-
-  .drawer-content-condition {
-    padding: 24px 0;
-
-    .condition-conent-group {
-      border-bottom: solid 1px #ebebeb;
-      padding-bottom: 20px;
-
-      .condition-group-title {
-        padding: 0 24px;
-        background: #f7f8fa;
-        height: 48px;
-        border-top: solid 1px #ebebeb;
-        border-bottom: solid 1px #ebebeb;
-        margin-bottom: 12px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
-
-      .condition-group-select {
-        padding: 0 24px;
-      }
-
-      .remove {
-        color: #828282;
-
-        &:hover {
-          cursor: pointer;
-          color: #4880ff;
-        }
-      }
-
-      .mg-bot-10 {
-        margin-bottom: 10px;
-      }
-
-      .conditionbtn {
-        .el-button {
-          border: 1px dashed #4880ff;
-          width: 110px;
-        }
-      }
-    }
-
-    .conditionbtn {
-      padding: 0 24px;
-      margin-top: 26px;
-
-      .el-button {
-        border: solid 1px #4880ff;
-        color: #4880ff;
-        width: 123px;
-      }
-    }
-  }
-
-  .set_promoter_footer {
-    height: 80px;
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    padding: 24px;
-    justify-content: flex-end;
-    background: #fff;
-    width: 100%;
-    border-top: 1px solid #ebebeb;
-    z-index: 2;
-  }
-
-  .icon-icon_explain {
-    color: #bfbfbf;
-  }
-}
-.error_tip {
-  position: absolute;
-  top: 36px;
-  right: 0px;
-  transform: translate(150%, 0px);
-
-  i {
-    font-size: 24px;
-  }
-}
-
-.add-node-popover-body {
-  display: flex;
-}
-
-.el-drawer:focus,
-.el-drawer__close-btn:focus {
-  outline: none;
-}
 </style>

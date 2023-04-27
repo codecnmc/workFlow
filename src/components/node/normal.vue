@@ -2,7 +2,7 @@
  * @Author: 羊驼
  * @Date: 2023-04-25 10:32:20
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-04-27 16:02:02
+ * @LastEditTime: 2023-04-27 16:57:07
  * @Description: 审核人节点
 -->
 <template>
@@ -34,7 +34,7 @@
               >
                 请选择{{ placeholderList() }}
               </span>
-               {{ setApproverStr() }}
+              <span v-else>{{ setApproverStr() }}</span>
             </template>
           </div>
           <div

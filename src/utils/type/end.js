@@ -2,7 +2,7 @@
  * @Author: 羊驼
  * @Date: 2023-04-27 14:15:11
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-04-27 15:59:39
+ * @LastEditTime: 2023-04-27 16:58:15
  * @Description: 结束类型
  */
 import { NodeType } from "../config"
@@ -37,8 +37,7 @@ export default class EndType extends BaseType {
     }
 
     handleText(nodeConfig) {
-        nodeConfig.error = false
-        return ""
+        return "暂无配置"
     }
 
     beforeSave(nodeConfig) { }

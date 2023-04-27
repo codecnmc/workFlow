@@ -2,10 +2,11 @@
  * @Author: 羊驼
  * @Date: 2023-04-25 16:28:53
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-04-25 16:30:38
+ * @LastEditTime: 2023-04-27 16:46:28
  * @Description: 表单类型通用mixin
  */
 export default {
+    inject: ["useroptions", "directorLevelList"],
     props: ["value"],
     model: {
         prop: "value",
@@ -13,56 +14,8 @@ export default {
     },
     data() {
         return {
-            // 对我用不上 先保留
-            directorLevelList: [
-                {
-                    value: "1",
-                    label: "第一级主管",
-                },
-                {
-                    value: "2",
-                    label: "第二级主管",
-                },
-                {
-                    value: "3",
-                    label: "第三级主管",
-                },
-                {
-                    value: "4",
-                    label: "第四级主管",
-                },
-                {
-                    value: "5",
-                    label: "第五级主管",
-                },
-                {
-                    value: "6",
-                    label: "第六级主管",
-                },
-                {
-                    value: "7",
-                    label: "第七级主管",
-                },
-                {
-                    value: "8",
-                    label: "第八级主管",
-                },
-                {
-                    value: "9",
-                    label: "第九级主管",
-                },
-                {
-                    value: "10",
-                    label: "第十级主管",
-                },
-            ],
             // 主管层级
             directorLevel: "1",
-            // 用户options
-            useroptions: [
-                { name: "admin", id: "1", userName: "admin" },
-                { name: "Anna", id: "2", userName: "Anna" },
-            ],
         }
     },
     computed: {
