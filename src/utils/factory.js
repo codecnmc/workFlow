@@ -2,7 +2,7 @@
  * @Author: 羊驼
  * @Date: 2023-04-27 14:02:51
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-04-27 15:07:05
+ * @LastEditTime: 2023-04-27 15:30:37
  * @Description: 类型生成以及配置
  */
 
@@ -99,8 +99,8 @@ class TypeFactory {
      * @param {*}
      * @return {*}
      */
-    getTypeTextHandle(type) {
-        return this.factory[type] && this.factory[type].handleText(type) || ""
+    getTypeTextHandle(type, nodeConfig) {
+        return this.factory[type] && this.factory[type].handleText(nodeConfig) || ""
     }
 
     /**
@@ -108,8 +108,8 @@ class TypeFactory {
      * @param {*}
      * @return {*}
      */
-    getTypeBeforeSave(type) {
-        return this.factory[type] && this.factory[type].beforeSave(type)
+    getTypeBeforeSave(type, nodeConfig) {
+        return this.factory[type] && this.factory[type].beforeSave(nodeConfig)
     }
 
     /**
@@ -125,7 +125,7 @@ class TypeFactory {
      * @description: 获取表单组件名称
      * @param {*}
      * @return {*}
-     */    
+     */
     getFormComponentName(type) {
         return this.factory[type] && this.factory[type].form
     }

@@ -2,7 +2,7 @@
  * @Author: 羊驼
  * @Date: 2023-04-25 10:34:46
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-04-27 13:49:16
+ * @LastEditTime: 2023-04-27 16:07:26
  * @Description: file content
  */
 import addNode from "../addNode";
@@ -18,7 +18,7 @@ export default {
         event: "input"
     },
     emits: ["openDrawer"],
-    inject: ["setApproverStr", "conditionStr", "getFlatRoot", "openDrawer"],
+    inject: ["getFlatRoot", "openDrawer"],
     computed: {
         nodeConfig: {
             get() {
@@ -29,31 +29,30 @@ export default {
             }
         }
     },
-    data() {
-        return {
-            placeholderList: ["发起人", "审核人", "抄送人"],
-        }
-    },
     mounted() {
         if (this.value == undefined) {
             throw Error("无绑定v-model 请绑定")
         }
-        let nodeType = this.$nodeType
-        switch (this.nodeConfig.type) {
-            case nodeType.审核人:
-            case nodeType.抄送人:
-                this.nodeConfig.error = this.setApproverStr(this.nodeConfig) == "";
-                break;
-            case nodeType.条件分支:
-                for (var i = 0; i < this.nodeConfig.conditionNodes.length; i++) {
-                    this.nodeConfig.conditionNodes[i].error =
-                        this.conditionStr(this.nodeConfig.conditionNodes[i], i) ==
-                        "请设置条件";
-                }
-                break;
-        }
+        this.setApproverStr()
     },
     methods: {
+        placeholderList() {
+            return this.$nodeType.toString(this.nodeConfig.type)
+        },
+        setApproverStr() {
+            this.nodeConfig.error == this.$factory.getTypeTextHandle(
+                this.nodeConfig.type,
+                this.nodeConfig
+            ) == "";
+        },
+        setConditionStr(item) {
+            let str = this.$factory.getTypeTextHandle(
+                item.type,
+                item
+            )
+            item.error = str == "请设置条件"
+            return str
+        },
         // 删除节点
         delNode() {
             let fatherID = this.nodeConfig.fatherID

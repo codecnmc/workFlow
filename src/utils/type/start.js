@@ -2,7 +2,7 @@
  * @Author: 羊驼
  * @Date: 2023-04-27 14:15:11
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-04-27 14:20:21
+ * @LastEditTime: 2023-04-27 15:59:46
  * @Description: 开始类型
  */
 import { NodeType } from "../config"
@@ -37,7 +37,8 @@ export default class StartType extends BaseType {
     }
 
     handleText(nodeConfig) {
-
+        nodeConfig.error = false
+        return ""
     }
 
     beforeSave(nodeConfig) { }

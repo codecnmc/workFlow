@@ -2,7 +2,7 @@
  * @Author: 羊驼
  * @Date: 2023-04-25 10:32:20
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-04-27 13:46:58
+ * @LastEditTime: 2023-04-27 16:02:02
  * @Description: 审核人节点
 -->
 <template>
@@ -27,13 +27,15 @@
         </div>
         <div class="content">
           <div class="text">
-            <span
-              class="placeholder"
-              v-if="setApproverStr(nodeConfig) === ''"
-            >
-              请选择{{ placeholderList[nodeConfig.type] }}
-            </span>
-            {{ setApproverStr(nodeConfig) }}
+            <template v-if="![$nodeType.开始,$nodeType.结束].includes(nodeConfig)">
+              <span
+                class="placeholder"
+                v-if="nodeConfig.error"
+              >
+                请选择{{ placeholderList() }}
+              </span>
+               {{ setApproverStr() }}
+            </template>
           </div>
           <div
             class="error_tip"
@@ -57,7 +59,7 @@
 
 <script>
 import mixin from "./mixin";
-import {nodeOffset} from "@/utils/tools.js";
+import { nodeOffset } from "@/utils/tools.js";
 export default {
   mixins: [mixin],
   computed: {

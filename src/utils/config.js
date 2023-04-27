@@ -2,7 +2,7 @@
  * @Author: 羊驼
  * @Date: 2023-04-25 14:33:54
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-04-27 14:05:15
+ * @LastEditTime: 2023-04-27 16:07:33
  * @Description: 流程图配置
  */
 import Vue from 'vue'
@@ -17,13 +17,13 @@ export const NodeType = {
     办理人: 5,
     结束: 6,
     分支跳点: 7,  // 跳出这次if else 回到主分支继续走
-    toString: (type) => {
+    toString: function (type) {
         for (let kv in this) {
             if (kv == "toString") continue
             if (this[kv] == type) return kv
         }
         return "未知类型"
-    }
+    },
 }
 
 
@@ -72,9 +72,6 @@ const FlowConfig = {
     // 允许条件嵌套数量
     conditionNestCount: 2,
 }
-
-
-
 
 Vue.prototype.$nodeType = NodeType
 Vue.prototype.$flowConfig = FlowConfig

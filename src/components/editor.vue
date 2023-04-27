@@ -2,7 +2,7 @@
  * @Author: 羊驼
  * @Date: 2023-04-27 11:47:24
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-04-27 15:18:56
+ * @LastEditTime: 2023-04-27 15:26:41
  * @Description: 节点编辑器
 -->
 <template>
@@ -106,48 +106,10 @@ export default {
     },
     //审批人抄送人显示和校验
     setApproverStr() {
-      let type = "会签";
-      let role = "部门主管";
-      if (nodeConfig.nodeUserType.type === "role") role = "角色";
-      if (nodeConfig.nodeUserType.type === "user") role = "用户";
-      if (nodeConfig.nodeUserType.value == "") return "";
-      if (nodeConfig.type === 1) {
-        //审批
-        if (nodeConfig.examineMode === "1") type = "会签";
-        if (nodeConfig.examineMode === "2") type = "或签";
-        if (nodeConfig.examineMode === "3") type = "逐级审批";
-        if (
-          nodeConfig.nodeUserType.type === "manager" &&
-          nodeConfig.examineMode === "3"
-        ) {
-          if (nodeConfig.nodeUserType.value.indexOf("m") != -1) {
-            return `由发起人向上的${nodeConfig.nodeUserType.valueName}审批`;
-          } else {
-            return `由${nodeConfig.nodeUserType.valueName}审批`;
-          }
-        }
-        if (
-          nodeConfig.nodeUserType.type === "manager" &&
-          nodeConfig.examineMode !== "3"
-        ) {
-          return `由${role}${type}`;
-        }
-        return `由${role}：${nodeConfig.nodeUserType.valueName}${type}`;
-      }
-      if (nodeConfig.type === 2) {
-        //抄送
-        if (nodeConfig.nodeUserType.value == "") return "";
-        if (nodeConfig.nodeUserType.type === "manager") {
-          //主管
-          if (nodeConfig.nodeUserType.value.indexOf("m") != -1) {
-            return `给发起人向上的${nodeConfig.nodeUserType.valueName}抄送`;
-          } else {
-            return `给${nodeConfig.nodeUserType.valueName}抄送`;
-          }
-        }
-        // 角色、用户
-        return `给${role}：${nodeConfig.nodeUserType.valueName}抄送`;
-      }
+      return this.$factory.getTypeTextHandle(
+        this.approverConfig.type,
+        this.nodeConfig
+      );
     },
     //保存弹框设置
     saveApprover() {
@@ -164,70 +126,6 @@ export default {
       // 默认条件
       this.approverConfig = JSON.parse(JSON.stringify(data));
       this.nodeName = this.approverConfig.nodeName;
-    },
-    //条件显示
-    conditionStr(item, index) {
-      let {
-        conditionList, //条件组
-        conditionString, //条件数据
-        conditionStringName, //条件显示
-      } = item;
-      let arr = [true]; //判断条件是否有值
-      if (conditionList.length === 0 || conditionString === "") {
-        if (item.nodeName === "默认") {
-          return "其他情况";
-        }
-        return "请设置条件";
-      }
-      if (conditionList.length !== 0) {
-        if (conditionList.length === 1) {
-          //当条件组为一个
-          conditionList[0].conditionChildrenNodes &&
-            conditionList[0].conditionChildrenNodes.forEach((item, index) => {
-              if (
-                item.leftFileds == "" ||
-                item.centerFileds == "" ||
-                item.rightFileds == ""
-              ) {
-                arr.push(false);
-              }
-              if (index !== 0 && item.conditionOperator == "") {
-                arr.push(false);
-              }
-            });
-        } else {
-          //当条件组为多个（判断是否有运算符）
-          conditionList.forEach((item, index) => {
-            if (index != conditionList.length - 1) {
-              //条件组不为最后一个.校验是否有条件运算符
-              if (item.conditionGroupOperator == "") arr.push(false);
-            }
-            if (
-              item.conditionChildrenNodes &&
-              item.conditionChildrenNodes.length > 0
-            ) {
-              item.conditionChildrenNodes.forEach((it, ind) => {
-                if (
-                  it.leftFileds === "" ||
-                  it.centerFileds === "" ||
-                  it.rightFileds == ""
-                )
-                  arr.push(false);
-                if (ind !== 0 && it.conditionOperator == "") arr.push(false);
-              });
-            } else if (
-              item.conditionChildrenNodes &&
-              item.conditionChildrenNodes.length == 0
-            ) {
-              arr.push(false);
-            }
-          });
-        }
-        if (arr.includes(false)) {
-          return "请设置条件";
-        }
-      }
-      return conditionStringName;
     },
   },
 };

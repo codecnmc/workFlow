@@ -17,17 +17,11 @@
 import addNode from "./addNode";
 export default {
   name: "nodeWrap",
-  components: { addNode},
+  components: { addNode },
   props: ["isTried", "value"],
   model: {
     prop: "value",
     event: "input",
-  },
-  provide() {
-    return {
-      setApproverStr: () => {},
-      conditionStr: () => {},
-    };
   },
   computed: {
     // v-model绑定
@@ -41,7 +35,7 @@ export default {
     },
     // 获取节点组件
     getComponent() {
-      return this.$factory.getTypeComponentName(this.nodeConfig.type)
+      return this.$factory.getTypeComponentName(this.nodeConfig.type);
     },
   },
   methods: {
@@ -57,9 +51,18 @@ export default {
       }
       return arr.join("或");
     },
-   
   },
 };
 </script>
 <style lang="less">
+.error_tip {
+  position: absolute;
+  top: 36px;
+  right: 0px;
+  transform: translate(150%, 0px);
+
+  i {
+    font-size: 24px;
+  }
+}
 </style>

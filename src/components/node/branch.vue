@@ -2,7 +2,7 @@
  * @Author: 羊驼
  * @Date: 2023-04-25 10:57:30
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-04-27 13:47:13
+ * @LastEditTime: 2023-04-27 15:45:18
  * @Description: 分支情况
 -->
 <template>
@@ -54,7 +54,7 @@
                   @click.stop="arrTransfer(index)"
                 > &gt; </div>
                 <div class="content">
-                  {{ conditionStr(item, index) }}
+                  {{ setConditionStr(item) }}
                 </div>
                 <div
                   class="error_tip"
