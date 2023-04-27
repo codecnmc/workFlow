@@ -2,7 +2,7 @@
  * @Author: 羊驼
  * @Date: 2023-04-25 10:57:30
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-04-27 11:39:25
+ * @LastEditTime: 2023-04-27 13:47:13
  * @Description: 分支情况
 -->
 <template>
@@ -29,7 +29,7 @@
             <div class="condition-node-box">
               <div
                 class="auto-judge"
-                @click="setPerson(item.priorityLevel,item)"
+                @click="openDrawer(item)"
                 :class="isTried && item.error ? 'error active' : '' "
               >
                 <div

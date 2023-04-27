@@ -35,14 +35,17 @@
         </div>
       </div>
     </div>
+    <editor ref="editor"></editor>
   </div>
 </template>
 
 <script>
+import Editor from "../components/editor.vue";
 import nodeWrap from "../components/nodeWrap.vue";
 export default {
   components: {
     nodeWrap,
+    Editor,
   },
   data() {
     return {
@@ -96,8 +99,10 @@ export default {
       // 平铺所有节点
       getFlatRoot: () => this.getFlatDic(),
       findNode: this.findNode,
+      openDrawer: this.openDrawer,
     };
   },
+  // 初始化节点
   beforeMount() {
     this.nodeConfig = {
       error: true,
@@ -186,6 +191,10 @@ export default {
       } else if (type && value < 300) {
         this.nowVal += 10;
       }
+    },
+    // 打开编辑框
+    openDrawer(priorityLevel, item, data, tip) {
+      this.$refs.editor.openDrawer(priorityLevel, item, data, tip);
     },
   },
 };

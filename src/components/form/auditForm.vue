@@ -2,7 +2,7 @@
  * @Author: 羊驼
  * @Date: 2023-04-25 14:46:53
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-04-25 16:31:03
+ * @LastEditTime: 2023-04-27 13:47:44
  * @Description: 审核表单
 -->
 <template>
@@ -44,7 +44,6 @@
                 ></el-option>
               </el-select>
             </el-radio>
-            <cptPopver :type="true"></cptPopver>
             <el-radio :label="directorLevel">
               <span style="margin-right:8px">直到</span>
               <el-select
@@ -60,7 +59,6 @@
                 ></el-option>
               </el-select>
             </el-radio>
-            <!-- <cptPopver></cptPopver> -->
           </el-radio-group>
         </div>
         <div v-else>

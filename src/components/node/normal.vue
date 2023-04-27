@@ -2,7 +2,7 @@
  * @Author: 羊驼
  * @Date: 2023-04-25 10:32:20
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-04-27 09:33:08
+ * @LastEditTime: 2023-04-27 13:46:58
  * @Description: 审核人节点
 -->
 <template>
@@ -13,7 +13,7 @@
       :style="`margin-left:${offset}`"
       :class="(isTried && nodeConfig.error ? 'active error' : '') "
     >
-      <div @click="setPerson">
+      <div @click="openDrawer(nodeConfig)">
         <div
           class="title"
           :style="`background-color:${$flowConfig.headerColor[nodeConfig.type]}`"
