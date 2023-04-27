@@ -2,7 +2,7 @@
  * @Author: 羊驼
  * @Date: 2023-04-25 10:32:20
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-04-26 17:39:24
+ * @LastEditTime: 2023-04-27 09:33:08
  * @Description: 审核人节点
 -->
 <template>
@@ -57,34 +57,13 @@
 
 <script>
 import mixin from "./mixin";
+import {nodeOffset} from "@/utils/tools.js";
 export default {
   mixins: [mixin],
   computed: {
     offset() {
-      let maxLevel = 1;
       let dic = this.getFlatRoot();
-      for (let kv in dic) {
-        maxLevel = Math.max(maxLevel, dic[kv].level);
-      }
-      let level = maxLevel - 2;
-      if (this.nodeConfig.type == this.$nodeType.结束) {
-        // 偏移懒得算 有需求可以自己加
-        switch (level) {
-          case 1:
-            return "190px";
-          case 2:
-            return "500px";
-          default:
-            return "0px";
-        }
-      }
-      if (this.nodeConfig.level > 2) {
-        return "240px";
-      }
-      if(level>0){
-        return "180px"
-      }
-      return "0px";
+      return nodeOffset(this.nodeConfig, dic);
     },
   },
 };

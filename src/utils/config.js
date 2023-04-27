@@ -2,14 +2,14 @@
  * @Author: 羊驼
  * @Date: 2023-04-25 14:33:54
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-04-26 17:34:33
+ * @LastEditTime: 2023-04-27 11:35:05
  * @Description: 流程图配置
  */
 import Vue from 'vue'
 // 生成的id不能重复！
 import { v4 } from "uuid"
 // 常用类型 全局化 防止swtich语句不知道是谁用的
-const NodeType = {
+export const NodeType = {
     开始: 0,
     审核人: 1,
     抄送人: 2,
@@ -69,6 +69,7 @@ class TypeFactory {
             error: false,
             nodeId: v4(),
             childNode,
+            type: NodeType.分支跳点,
             fatherID,
             level
         }
@@ -278,8 +279,12 @@ const FlowConfig = {
             class: "condition",
         }
     ],
-    conditionNestCount: 2,  // 允许条件嵌套数量
+    // 允许条件嵌套数量
+    conditionNestCount: 2,
 }
+
+
+
 
 Vue.prototype.$nodeType = NodeType
 Vue.prototype.$flowConfig = FlowConfig

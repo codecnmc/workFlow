@@ -2,7 +2,7 @@
  * @Author: 羊驼
  * @Date: 2023-04-25 10:57:30
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-04-26 17:04:17
+ * @LastEditTime: 2023-04-27 11:39:25
  * @Description: 分支情况
 -->
 <template>
@@ -105,6 +105,8 @@
 
 <script>
 import mixin from "./mixin";
+import { getMaxLevel } from "@/utils/tools.js";
+
 export default {
   mixins: [mixin],
   computed: {
@@ -112,11 +114,14 @@ export default {
     condtionsOffset() {
       let nodeLength = this.nodeConfig.conditionNodes.length;
       let offset = 0;
-      let count = this.nodeConfig.level - 2;
+      let count = this.nodeConfig.level - 1;
       offset = 240 * count;
       if (nodeLength > 5) {
         // 1080p下 五个极限了 再靠左就遮住了 所以往右偏移一点
         return -240 - 3 * 190 + offset + "px";
+      }
+      if (this.nodeConfig.level == 1 && !this.findChildIsBranch()) {
+        offset = 190;
       }
       return (
         -240 - (this.nodeConfig.conditionNodes.length - 2) * 190 + offset + "px"
@@ -149,6 +154,23 @@ export default {
     },
   },
   methods: {
+    // 查找是否有条件节点嵌套了条件分支
+    findChildIsBranch() {
+      let level = getMaxLevel(this.getFlatRoot());
+      if (level <= this.nodeConfig.level) {
+        return true;
+      }
+      for (let i = 0; i < this.nodeConfig.conditionNodes.length; i++) {
+        let item = this.nodeConfig.conditionNodes[i];
+        while (item.childNode) {
+          if (item.childNode.type == this.$nodeType.条件分支) {
+            return true;
+          }
+          item = item.childNode;
+        }
+      }
+      return false;
+    },
     // 设置条件的error状态
     checkCondtions() {
       for (var i = 0; i < this.conditions.length; i++) {
@@ -200,7 +222,9 @@ export default {
       this.conditions.splice(index, 1);
       this.checkCondtions();
       if (this.nodeConfig.conditionNodes.length == 1) {
+        // 删除跳点
         if (this.nodeConfig.childNode) {
+          //  续接上一分支后需要降层次等级
           // 这句的意思是 当删除的长度为1的时候 代表整个条件节点给干掉了 要把数组第一位的链表续接到主分支下去
           if (this.nodeConfig.conditionNodes[0].childNode) {
             this.reData(
@@ -211,11 +235,25 @@ export default {
             this.conditions[0].childNode = this.nodeConfig.childNode;
           }
         }
+        let node = this.conditions[0].childNode;
+        while (node) {
+          let item = node.childNode;
+          if (!item) {
+            break;
+          }
+          if (item.type == this.$nodeType.分支跳点) {
+            node.childNode = null;
+          }
+          node = item;
+        }
         this.$emit("input", this.conditions[0].childNode);
       }
     },
     // 递归续接链表
     reData(data, addData) {
+      if (data.level > 1) {
+        data.level -= 1;
+      }
       if (!data.childNode) {
         data.childNode = addData;
       } else {

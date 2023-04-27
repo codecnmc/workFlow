@@ -68,19 +68,20 @@ export default {
       // 判断这个节点是不是判断节点 不能嵌套太多层条件 否则会出问题
       // console.log(this.nodeConfig);
       let level = this.nodeConfig.level;
-      if (type == this.$nodeType.条件分支) {
+      let branch = this.$nodeType.条件分支;
+      if (type == branch && this.nodeConfig.type == this.$nodeType.条件) {
         level += 1;
-        if (level > 2) {
-          this.nodeConfig.childNode = this.$factory.getStruct(
-            this.nodeConfig && this.nodeConfig.nodeId,
-            this.$nodeType.分支跳点,
-            null,
-            level
-          );
-        }
-        if (level >= this.$flowConfig.conditionNestCount + 2) {
+        if (level >= this.$flowConfig.conditionNestCount + 1) {
           return this.$message.error("已超过最大嵌套限制数量");
         }
+      }
+      if (level > 1 && type == branch) {
+        this.nodeConfig.childNode = this.$factory.getStruct(
+          this.nodeConfig && this.nodeConfig.nodeId,
+          this.$nodeType.分支跳点,
+          null,
+          level
+        );
       }
 
       let data = this.$factory.getStruct(
@@ -107,7 +108,6 @@ export default {
       } else {
         this.nodeConfig.childNode = data;
       }
-
     },
   },
 };
