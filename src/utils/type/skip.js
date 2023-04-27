@@ -16,14 +16,14 @@ export default class AuditType extends BaseType {
 
     filename = ""
     form = ""
-    type = NodeType.分支跳点
+    type = NodeType.分支跳出
 
     getStruct(fatherID, childNode, level) {
         return {
             error: false,
             nodeId: getUUID(),
             childNode,
-            type: NodeType.分支跳点,
+            type: NodeType.分支跳出,
             fatherID,
             level
         }

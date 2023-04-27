@@ -2,7 +2,7 @@
  * @Author: 羊驼
  * @Date: 2023-04-25 14:33:54
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-04-27 16:07:33
+ * @LastEditTime: 2023-04-27 17:21:57
  * @Description: 流程图配置
  */
 import Vue from 'vue'
@@ -16,7 +16,7 @@ export const NodeType = {
     条件分支: 4,
     办理人: 5,
     结束: 6,
-    分支跳点: 7,  // 跳出这次if else 回到主分支继续走
+    分支跳出: 7,  // 跳出这次if else 回到主分支继续走
     toString: function (type) {
         for (let kv in this) {
             if (kv == "toString") continue

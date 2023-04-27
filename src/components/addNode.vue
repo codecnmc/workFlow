@@ -41,6 +41,7 @@
 <script>
 export default {
   props: ["value", "tip"],
+  inject: ["openDrawer"],
   data() {
     return {
       visible: false,
@@ -69,19 +70,24 @@ export default {
       // console.log(this.nodeConfig);
       let level = this.nodeConfig.level;
       let branch = this.$nodeType.条件分支;
+      // 解决条件嵌套导向的问题
       if (type == branch && this.nodeConfig.type == this.$nodeType.条件) {
         level += 1;
         if (level >= this.$flowConfig.conditionNestCount + 1) {
           return this.$message.error("已超过最大嵌套限制数量");
         }
       }
+
+      // TODO 分支跳出检测的问题 如果childNode存在 而且下面没有分支跳出 要补充上 后续要计算分支跳出连接的点 方便后续后端操作
       if (level > 1 && type == branch) {
-        this.nodeConfig.childNode = this.$factory.getStruct(
-          this.nodeConfig && this.nodeConfig.nodeId,
-          this.$nodeType.分支跳点,
-          null,
-          level
-        );
+        if (!this.nodeConfig.childNode) {
+          this.nodeConfig.childNode = this.$factory.getStruct(
+            this.nodeConfig && this.nodeConfig.nodeId,
+            this.$nodeType.分支跳出,
+            null,
+            level
+          );
+        }
       }
 
       let data = this.$factory.getStruct(
@@ -90,14 +96,6 @@ export default {
         null,
         level
       );
-
-      // 解决条件嵌套导向的问题
-      if (this.$flowConfig.createPopupImmediately) {
-        //添加节点自动弹出弹框
-        type != 4
-          ? this.$parent.setPerson("", "", data, this.tip)
-          : this.$parent.setPerson(1, "", data);
-      }
 
       // 修改原来添加的逻辑 他是直接覆盖下一节点 而不是链表链接
       if (this.nodeConfig.childNode) {
@@ -108,6 +106,9 @@ export default {
       } else {
         this.nodeConfig.childNode = data;
       }
+
+      //添加节点自动弹出弹框
+      this.$flowConfig.createPopupImmediately && this.openDrawer(data);
     },
   },
 };

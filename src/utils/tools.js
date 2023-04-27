@@ -2,7 +2,7 @@
  * @Author: 羊驼
  * @Date: 2023-04-27 09:28:34
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-04-27 11:14:02
+ * @LastEditTime: 2023-04-27 17:39:50
  * @Description: 帮助方法
  */
 import { NodeType } from "./config"
@@ -19,7 +19,7 @@ export function nodeOffset(nodeConfig, flatDic) {
         // 偏移懒得算 有需求可以自己加
         switch (level) {
             case 1:
-                return "190px";
+                return "240px";
             default:
                 return "0px";
         }

@@ -2,7 +2,7 @@
  * @Author: 羊驼
  * @Date: 2023-04-25 10:57:30
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-04-27 15:45:18
+ * @LastEditTime: 2023-04-27 17:42:29
  * @Description: 分支情况
 -->
 <template>
@@ -138,10 +138,11 @@ export default {
     // 解决条件分支添加按钮偏移量
     condtionAddButton() {
       let nodeLength = this.nodeConfig.conditionNodes.length;
+      let offset = 0;
       if (nodeLength > 5) {
         return -(nodeLength - 5) * 380 + "px";
       }
-      return 0;
+      return offset;
     },
     // 条件节点
     conditions: {
@@ -241,7 +242,7 @@ export default {
           if (!item) {
             break;
           }
-          if (item.type == this.$nodeType.分支跳点) {
+          if (item.type == this.$nodeType.分支跳出) {
             node.childNode = null;
           }
           node = item;
