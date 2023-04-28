@@ -2,7 +2,7 @@
  * @Author: 羊驼
  * @Date: 2023-04-25 14:33:54
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-04-27 17:21:57
+ * @LastEditTime: 2023-04-28 14:04:26
  * @Description: 流程图配置
  */
 import Vue from 'vue'

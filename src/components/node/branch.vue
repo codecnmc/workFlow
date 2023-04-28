@@ -2,7 +2,7 @@
  * @Author: 羊驼
  * @Date: 2023-04-25 10:57:30
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-04-27 17:42:29
+ * @LastEditTime: 2023-04-28 14:02:25
  * @Description: 分支情况
 -->
 <template>
@@ -115,7 +115,11 @@ export default {
       let nodeLength = this.nodeConfig.conditionNodes.length;
       let offset = 0;
       let count = this.nodeConfig.level - 1;
+      if (this.nodeConfig.level > 2) {
+        count -= 1;
+      }
       offset = 240 * count;
+
       if (nodeLength > 5) {
         // 1080p下 五个极限了 再靠左就遮住了 所以往右偏移一点
         return -240 - 3 * 190 + offset + "px";
@@ -176,7 +180,7 @@ export default {
     checkCondtions() {
       for (var i = 0; i < this.conditions.length; i++) {
         this.conditions[i].error =
-          this.conditionStr(this.conditions[i], i) == "请设置条件" &&
+          this.setConditionStr(this.conditions[i], i) == "请设置条件" &&
           i != this.conditions.length - 1;
       }
     },
