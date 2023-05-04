@@ -2,7 +2,7 @@
  * @Author: 羊驼
  * @Date: 2023-04-27 14:15:11
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-04-27 15:25:26
+ * @LastEditTime: 2023-05-04 17:39:52
  * @Description: 抄送人类型
  */
 import { NodeType } from "../config"
@@ -56,6 +56,8 @@ export default class CarbornType extends BaseType {
         return `给${role}：${nodeConfig.nodeUserType.valueName}抄送`;
     }
 
-    beforeSave(nodeConfig) { }
+    beforeSave(nodeConfig) {
+        return true
+    }
 
 }

@@ -2,7 +2,7 @@
  * @Author: 羊驼
  * @Date: 2023-04-25 16:28:53
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-04-27 16:46:28
+ * @LastEditTime: 2023-05-04 17:35:51
  * @Description: 表单类型通用mixin
  */
 export default {
@@ -26,6 +26,14 @@ export default {
             set(value) {
                 this.$emit("input", approverConfig);
             },
+        },
+        setting: {
+            get() {
+                return this.approverConfig.setting
+            },
+            set(value) {
+                this.approverConfig.setting = value
+            }
         },
         setTypeLabel() {
             if (this.approverConfig.nodeUserType.type === "manager")

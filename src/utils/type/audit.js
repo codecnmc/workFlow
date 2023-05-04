@@ -2,7 +2,7 @@
  * @Author: 羊驼
  * @Date: 2023-04-27 14:15:11
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-04-27 15:30:49
+ * @LastEditTime: 2023-05-04 17:40:23
  * @Description: 审核人类型
  */
 import { NodeType } from "../config"
@@ -67,6 +67,8 @@ export default class AuditType extends BaseType {
         return `由${role}：${nodeConfig.nodeUserType.valueName}${type}`;
     }
 
-    beforeSave(nodeConfig) { }
+    beforeSave(nodeConfig) {
+        return true
+    }
 
 }

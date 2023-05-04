@@ -2,7 +2,7 @@
  * @Author: 羊驼
  * @Date: 2023-04-25 14:33:54
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-04-28 14:04:26
+ * @LastEditTime: 2023-05-04 16:14:11
  * @Description: 流程图配置
  */
 import Vue from 'vue'
@@ -56,12 +56,12 @@ const FlowConfig = {
             icon: "./img/抄送人.png",
             class: "notifier",
         },
-        {
-            type: NodeType.办理人,
-            label: "办理人",
-            icon: "./img/抄送人.png",
-            class: "notifier",
-        },
+        // {
+        //     type: NodeType.办理人,
+        //     label: "办理人",
+        //     icon: "./img/办理人.png",
+        //     class: "notifier",
+        // },
         {
             type: NodeType.条件分支,
             label: "条件分支",

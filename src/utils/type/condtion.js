@@ -98,6 +98,8 @@ export default class ConditionType extends BaseType {
         return conditionStringName;
     }
 
-    beforeSave(nodeConfig) { }
+    beforeSave(nodeConfig) {
+        return true
+    }
 
 }

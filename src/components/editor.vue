@@ -2,7 +2,7 @@
  * @Author: 羊驼
  * @Date: 2023-04-27 11:47:24
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-04-27 17:04:38
+ * @LastEditTime: 2023-05-04 17:43:24
  * @Description: 节点编辑器
 -->
 <template>
@@ -11,6 +11,7 @@
     custom-class="set_promoter"
     append-to-body
     direction="rtl"
+    :before-close="closeHandle"
     size="560px"
   >
     <template v-if="approverConfig">
@@ -107,6 +108,12 @@ export default {
         this.approverConfig
       );
     },
+    getBeforeSave() {
+      return this.$factory.getTypeBeforeSave(
+        this.approverConfig.type,
+        this.approverConfig
+      );
+    },
     //保存弹框设置
     saveApprover() {
       let nodeType = this.$nodeType;
@@ -154,7 +161,6 @@ export default {
           this.approverConfig.nodeUserType.value = "主管";
         }
       }
-      this.approverConfig.error = this.setApproverStr() === "";
       this.saveData();
     },
     //保存条件设置
@@ -219,6 +225,9 @@ export default {
         node[kv] = this.approverConfig[kv];
       }
       node.nodeName = this.nodeName;
+      this.closeHandle(() => {
+        this.approverDrawer = false;
+      });
     },
     //打开弹框
     openDrawer(data) {
@@ -227,6 +236,11 @@ export default {
       // 默认条件
       this.approverConfig = JSON.parse(JSON.stringify(data));
       this.nodeName = this.approverConfig.nodeName;
+    },
+    //关闭前校验
+    closeHandle(done) {
+      this.approverConfig.error = this.getBeforeSave();
+      done();
     },
   },
 };
