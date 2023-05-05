@@ -2,7 +2,7 @@
  * @Author: 羊驼
  * @Date: 2023-04-27 14:15:11
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-05-05 11:12:56
+ * @LastEditTime: 2023-05-05 11:54:47
  * @Description: 开始类型
  */
 import { NodeType } from "../config"
@@ -60,7 +60,7 @@ export default class StartType extends BaseType {
                 return ["提交人：均不可提交"]
         }
         carbonTextHandle(nodeSetting.carbonCopySetting, text)
-        return text.length > 0 && text || "暂无配置"
+        return text.length > 0 && text || ["暂无配置"]
     }
 
     beforeSave(nodeConfig) {

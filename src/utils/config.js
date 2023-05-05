@@ -2,7 +2,7 @@
  * @Author: 羊驼
  * @Date: 2023-04-25 14:33:54
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-05-04 16:14:11
+ * @LastEditTime: 2023-05-05 11:48:56
  * @Description: 流程图配置
  */
 import Vue from 'vue'
@@ -26,6 +26,16 @@ export const NodeType = {
     },
 }
 
+export const levelOptions = [
+    {
+        value: 1,
+        label: "一级部门主管",
+    },
+    {
+        value: 2,
+        label: "二级部门主管",
+    },
+]
 
 // 配置
 const FlowConfig = {
@@ -71,6 +81,7 @@ const FlowConfig = {
     ],
     // 允许条件嵌套数量
     conditionNestCount: 2,
+    levelOptions
 }
 
 Vue.prototype.$nodeType = NodeType

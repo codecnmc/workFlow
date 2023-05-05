@@ -2,11 +2,13 @@
  * @Author: 羊驼
  * @Date: 2023-04-27 14:15:11
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-05-04 17:40:23
+ * @LastEditTime: 2023-05-05 15:05:26
  * @Description: 审核人类型
  */
-import { NodeType } from "../config"
+import { NodeType, levelOptions } from "../config"
 import { BaseType, getUUID } from "../factory"
+import { carbonTextHandle, carbonValidate } from "../tools"
+
 /**
  * @description: 审核人类型
  * @param {*}
@@ -24,12 +26,14 @@ export default class AuditType extends BaseType {
             error: true,
             type: this.type,
             nodeId: getUUID(),
-            examineMode: "1",
-            nodeUserType: {
-                type: "manager",
-                value: "",
-                valueList: [],
-                valueName: "",
+            setting: {
+                auditType: 0,
+                approverLevel: 1,
+                approverType: 0,
+                approverMember: [],
+                multipleMode: 0,
+                sameMode: 1,
+                carbonCopySetting: []
             },
             childNode,
             fatherID,
@@ -39,36 +43,62 @@ export default class AuditType extends BaseType {
     }
 
     handleText(nodeConfig) {
-        let type = "会签";
-        let role = "部门主管";
-        if (nodeConfig.nodeUserType.type === "role") role = "角色";
-        if (nodeConfig.nodeUserType.type === "user") role = "用户";
-        if (nodeConfig.nodeUserType.value == "") return "";
-        //审批
-        if (nodeConfig.examineMode === "1") type = "会签";
-        if (nodeConfig.examineMode === "2") type = "或签";
-        if (nodeConfig.examineMode === "3") type = "逐级审批";
-        if (
-            nodeConfig.nodeUserType.type === "manager" &&
-            nodeConfig.examineMode === "3"
-        ) {
-            if (nodeConfig.nodeUserType.value.indexOf("m") != -1) {
-                return `由发起人向上的${nodeConfig.nodeUserType.valueName}审批`;
-            } else {
-                return `由${nodeConfig.nodeUserType.valueName}审批`;
-            }
+        let text = []
+        let nodeSetting = nodeConfig.setting
+        switch (nodeSetting.auditType) {
+            case 0:
+                this.handleApproverText(nodeSetting, text)
+                break;
+            case 1:
+            case 2:
+                let data = nodeSetting.auditType == 1 ? "自动通过" : "自动拒绝"
+                nodeConfig.nodeName = data
+                return [data]
         }
-        if (
-            nodeConfig.nodeUserType.type === "manager" &&
-            nodeConfig.examineMode !== "3"
-        ) {
-            return `由${role}${type}`;
+        carbonTextHandle(nodeSetting.carbonCopySetting, text)
+        return text.length > 0 && text || ["暂无配置"];
+    }
+
+    handleApproverText(nodeSetting, text) {
+        switch (nodeSetting.approverType) {
+            case 0:
+                text.push(`审核人：直属上级`)
+                break;
+            case 1:
+                text.push(`审核人：${levelOptions.find((x) => x.value == nodeSetting.approverLevel).label}`)
+                break;
+            case 2:
+                text.push(`审核人：${nodeSetting.approverMember.map((x) => x.name).toString()}`)
+                if (nodeSetting.approverMember.length > 1) {
+                    switch (nodeSetting.multipleMode) {
+                        case 0:
+                            text.push("多人审核模式：会签")
+                            break;
+                        case 1:
+                            text.push("多人审核模式：或签")
+                            break
+                        case 2:
+                            text.push("多人审核模式：依次审批")
+                            break;
+                    }
+                }
+                break;
         }
-        return `由${role}：${nodeConfig.nodeUserType.valueName}${type}`;
     }
 
     beforeSave(nodeConfig) {
-        return true
+        let nodeSetting = nodeConfig.setting
+        switch (nodeSetting.auditType) {
+            case 0:
+                if (nodeSetting.approverType == 2 && nodeSetting.approverMember == 0) {
+                    return false
+                }
+                break;
+            case 1:
+            case 2:
+                return true
+        }
+        return carbonValidate(nodeConfig.setting.carbonCopySetting)
     }
 
 }

@@ -54,41 +54,9 @@ export default {
       // 报错的数据
       tipList: [],
       // 展示节点结构 初始化会更换为开始节点
-      nodeConfig: {
-        error: true,
-        childNode: {
-          nodeName: "审核人",
-          nodeUserType: {
-            valueName: "admin",
-            valueList: ["admin"],
-            type: "user",
-            value: "admin",
-          },
-          examineMode: "1",
-          error: false,
-          type: 1,
-          nodeId: "approvalID",
-        },
-      },
+      nodeConfig: {},
       // 缩放比例
       nowVal: 100,
-      // 暂时还不知道作用
-      nodeConfigss: {
-        type: 0, //类型
-        priorityLevel: "", //优先级
-        settype: "", //审批人类型
-        selectMode: "", // 1人还是多人
-        selectRange: "", //选择范围
-        directorLevel: "", // 主管层级
-        examineMode: "", //多人审批时采用的审批方式  （依次审批 ，会签）
-        noHanderAction: "", //审批人为空时 (自动审批通过/不允许发起, 转交给审核管理员)
-        examineEndType: "",
-        examineEndRoleId: "",
-        examineEndDirectorLevel: "", // 审批终点层级
-        ccSelfSelectFlag: "", // 抄送人
-        conditionList: [], //条件设置
-        nodeUserList: [], // 人员列表
-      },
     };
   },
   // 让子组件都能拿到根节点 方便计算
@@ -106,7 +74,19 @@ export default {
           user_id: "asdbc",
           name: "测试数据",
         },
+        {
+          user_id: "asdbc2",
+          name: "测试数据2",
+        },
       ],
+      // 选择类型
+      typeOptions: {
+        直属上级: 0,
+        部门负责人: 1,
+        指定成员: 2,
+      },
+      // 部门等级
+      levelOptions: this.$flowConfig.levelOptions,
     };
   },
   // 初始化节点

@@ -2,10 +2,10 @@
  * @Author: 羊驼
  * @Date: 2023-04-27 09:28:34
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-05-05 11:09:29
+ * @LastEditTime: 2023-05-05 11:49:53
  * @Description: 帮助方法
  */
-import { NodeType } from "./config"
+import { NodeType, levelOptions } from "./config"
 
 /**
  * @description:  计算普通节点偏移量
@@ -42,6 +42,8 @@ export function nodeOffset(nodeConfig, flatDic) {
     return "0px";
 }
 
+
+
 /**
  * @description: 获取最大的层次等级
  * @param {*}
@@ -69,7 +71,7 @@ export function carbonTextHandle(data, text) {
                 value += "直属主管"
                 break;
             case 1:
-                value += setting.level == 1 ? "一级部门主管" : "二级部门主管"
+                value += levelOptions.find((x) => x.value == setting.level).label
                 break;
             case 2:
                 value += setting.member.map((x) => x.name).toString()

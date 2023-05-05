@@ -2,7 +2,7 @@
  * @Author: 羊驼
  * @Date: 2023-05-05 10:31:28
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-05-05 11:14:14
+ * @LastEditTime: 2023-05-05 14:22:37
  * @Description: 可以复用的抄送人组件
 -->
 <template>
@@ -28,12 +28,14 @@
             ></el-button>
           </div>
         </template>
-        <el-radio-group v-model="item.type">
+        <el-radio-group
+          v-model="item.type"
+          @input="refreshSelect"
+        >
           <el-radio
             v-for="(value,key) in typeOptions"
             :key="value*100"
             :label="value"
-            @change="refreshSelect"
           >{{key}}</el-radio>
         </el-radio-group>
       </el-descriptions-item>
@@ -86,6 +88,7 @@
 <script>
 export default {
   props: ["value", "memberOptions"],
+  inject: ["levelOptions", "typeOptions"],
   model: {
     prop: "value",
     event: "input",
@@ -107,21 +110,6 @@ export default {
         level: 1, // 如果为部门负责人 选择层级
         member: [],
       },
-      typeOptions: {
-        直属上级: 0,
-        部门负责人: 1,
-        指定成员: 2,
-      },
-      levelOptions: [
-        {
-          value: 1,
-          label: "一级部门主管",
-        },
-        {
-          value: 2,
-          label: "二级部门主管",
-        },
-      ],
       refresh: true,
     };
   },

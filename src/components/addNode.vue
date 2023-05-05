@@ -156,6 +156,7 @@ export default {
       p {
         color: #333;
         margin-top: 4px;
+        margin-bottom: 0;
       }
     }
     .approver {
