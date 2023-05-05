@@ -2,11 +2,13 @@
  * @Author: 羊驼
  * @Date: 2023-04-27 14:15:11
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-05-05 10:25:19
+ * @LastEditTime: 2023-05-05 11:12:56
  * @Description: 开始类型
  */
 import { NodeType } from "../config"
 import { BaseType, getUUID } from "../factory"
+import { carbonTextHandle, carbonValidate } from "../tools"
+
 /**
  * @description: 开始类型
  * @param {*}
@@ -57,21 +59,7 @@ export default class StartType extends BaseType {
             case "None":
                 return ["提交人：均不可提交"]
         }
-        for (let setting of nodeConfig.setting.carbonCopySetting) {
-            let value = "抄送人："
-            switch (setting.type) {
-                case 0:
-                    value += "直属主管"
-                    break;
-                case 1:
-                    value += setting.level == 1 ? "一级部门主管" : "二级部门主管"
-                    break;
-                case 2:
-                    value += setting.member.map((x) => x.name).toString()
-                    break;
-            }
-            text.push(value)
-        }
+        carbonTextHandle(nodeSetting.carbonCopySetting, text)
         return text.length > 0 && text || "暂无配置"
     }
 
@@ -84,12 +72,7 @@ export default class StartType extends BaseType {
             }
         }
         // 存在抄送人 但是没有选择成员的情况
-        for (let setting of nodeSetting.carbonCopySetting) {
-            if (setting.type == 2 && setting.member.length == 0) {
-                return false
-            }
-        }
-        return true
+        return carbonValidate(nodeSetting.carbonCopySetting)
     }
 
 }

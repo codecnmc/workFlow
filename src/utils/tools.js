@@ -2,7 +2,7 @@
  * @Author: 羊驼
  * @Date: 2023-04-27 09:28:34
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-04-28 13:49:57
+ * @LastEditTime: 2023-05-05 11:09:29
  * @Description: 帮助方法
  */
 import { NodeType } from "./config"
@@ -53,4 +53,42 @@ export function getMaxLevel(flatDic) {
         maxLevel = Math.max(maxLevel, flatDic[kv].level);
     }
     return maxLevel
+}
+
+/**
+ * @description: 抄送文本处理 抄送复用多 所以抽出来
+ * @param {*}
+ * @return {*}
+ */
+export function carbonTextHandle(data, text) {
+    if (typeof (data) != "object") throw Error("无效数据类型")
+    for (let setting of data) {
+        let value = "抄送人："
+        switch (setting.type) {
+            case 0:
+                value += "直属主管"
+                break;
+            case 1:
+                value += setting.level == 1 ? "一级部门主管" : "二级部门主管"
+                break;
+            case 2:
+                value += setting.member.map((x) => x.name).toString()
+                break;
+        }
+        text.push(value)
+    }
+}
+
+/**
+ * @description: 校验抄送数据
+ * @param {*}
+ * @return {*}
+ */
+export function carbonValidate(data) {
+    for (let setting of data) {
+        if (setting.type == 2 && setting.member.length == 0) {
+            return false
+        }
+    }
+    return true
 }

@@ -2,7 +2,7 @@
  * @Author: 羊驼
  * @Date: 2023-04-27 11:47:24
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-05-05 09:15:13
+ * @LastEditTime: 2023-05-05 11:20:01
  * @Description: 节点编辑器
 -->
 <template>
@@ -68,7 +68,7 @@
 
 <script>
 export default {
-  inject: ["findNode", "useroptions", "directorLevelList"],
+  inject: ["findNode"],
   computed: {
     // 获取表单组件
     getFormComponent() {

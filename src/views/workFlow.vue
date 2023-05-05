@@ -101,51 +101,10 @@ export default {
       findNode: this.findNode,
       openDrawer: this.openDrawer,
       // 用户options
-      useroptions: [
-        { name: "admin", id: "1", userName: "admin" },
-        { name: "Anna", id: "2", userName: "Anna" },
-      ],
-      // 对我用不上 先保留
-      directorLevelList: [
+      memberOptions: [
         {
-          value: "1",
-          label: "第一级主管",
-        },
-        {
-          value: "2",
-          label: "第二级主管",
-        },
-        {
-          value: "3",
-          label: "第三级主管",
-        },
-        {
-          value: "4",
-          label: "第四级主管",
-        },
-        {
-          value: "5",
-          label: "第五级主管",
-        },
-        {
-          value: "6",
-          label: "第六级主管",
-        },
-        {
-          value: "7",
-          label: "第七级主管",
-        },
-        {
-          value: "8",
-          label: "第八级主管",
-        },
-        {
-          value: "9",
-          label: "第九级主管",
-        },
-        {
-          value: "10",
-          label: "第十级主管",
+          user_id: "asdbc",
+          name: "测试数据",
         },
       ],
     };

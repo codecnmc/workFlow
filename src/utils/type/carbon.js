@@ -2,11 +2,13 @@
  * @Author: 羊驼
  * @Date: 2023-04-27 14:15:11
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-05-04 17:39:52
+ * @LastEditTime: 2023-05-05 11:11:12
  * @Description: 抄送人类型
  */
 import { NodeType } from "../config"
 import { BaseType, getUUID } from "../factory"
+import { carbonTextHandle, carbonValidate } from "../tools"
+
 /**
  * @description: 办理人类型
  * @param {*}
@@ -24,11 +26,14 @@ export default class CarbornType extends BaseType {
             error: true,
             type: this.type,
             nodeId: getUUID(),
-            nodeUserType: {
-                type: "manager",
-                value: "m-1",
-                valueName: "第一级主管",
-                valueList: [],
+            setting: {
+                carbonCopySetting: [
+                    {
+                        type: 1, // 直属上级
+                        level: 1, // 如果为部门负责人 选择层级
+                        member: [],
+                    },
+                ],   // 抄送人配置
             },
             childNode,
             fatherID,
@@ -37,27 +42,13 @@ export default class CarbornType extends BaseType {
     }
 
     handleText(nodeConfig) {
-        let type = "会签";
-        let role = "部门主管";
-        if (nodeConfig.nodeUserType.type === "role") role = "角色";
-        if (nodeConfig.nodeUserType.type === "user") role = "用户";
-        if (nodeConfig.nodeUserType.value == "") return "";
-        //抄送
-        if (nodeConfig.nodeUserType.value == "") return "";
-        if (nodeConfig.nodeUserType.type === "manager") {
-            //主管
-            if (nodeConfig.nodeUserType.value.indexOf("m") != -1) {
-                return `给发起人向上的${nodeConfig.nodeUserType.valueName}抄送`;
-            } else {
-                return `给${nodeConfig.nodeUserType.valueName}抄送`;
-            }
-        }
-        // 角色、用户
-        return `给${role}：${nodeConfig.nodeUserType.valueName}抄送`;
+        let text = []
+        carbonTextHandle(nodeConfig.setting.carbonCopySetting, text)
+        return text.length > 0 && text || "暂无配置"
     }
 
     beforeSave(nodeConfig) {
-        return true
+        return carbonValidate(nodeConfig.setting.carbonCopySetting)
     }
 
 }
