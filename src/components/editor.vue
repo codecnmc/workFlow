@@ -2,7 +2,7 @@
  * @Author: 羊驼
  * @Date: 2023-04-27 11:47:24
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-05-04 17:43:24
+ * @LastEditTime: 2023-05-05 09:15:13
  * @Description: 节点编辑器
 -->
 <template>
@@ -11,7 +11,7 @@
     custom-class="set_promoter"
     append-to-body
     direction="rtl"
-    :before-close="closeHandle"
+    :before-close="saveData"
     size="560px"
   >
     <template v-if="approverConfig">
@@ -121,46 +121,6 @@ export default {
       if (this.approverConfig.type === nodeType.条件) {
         return this.saveCondition();
       }
-      let list = this.approverConfig.nodeUserType.valueList;
-      let nameList = []; // 下拉框:审批角色是name，指定用户是userName
-      if (list.length > 0) {
-        this.useroptions.forEach((item) => {
-          list.forEach((i) => {
-            if (this.approverConfig.nodeUserType.type === "role") {
-              if (item.id === i) nameList.push(item.name);
-            }
-            if (this.approverConfig.nodeUserType.type === "user") {
-              if (item.id === i) nameList.push(item.userName);
-            }
-          });
-        });
-        this.approverConfig.nodeUserType.value = list.join(",");
-        this.approverConfig.nodeUserType.valueName = nameList.join(",");
-      } else if (this.approverConfig.nodeUserType.type !== "manager") {
-        this.approverConfig.nodeUserType.value = "";
-        this.approverConfig.nodeUserType.valueName = "";
-      }
-      if (this.approverConfig.nodeUserType.type === "manager") {
-        //抄送 、审批人逐级审批
-        if (
-          [nodeType.审核人, nodeType.抄送人].includes(this.approverConfig.type)
-        ) {
-          let num = this.approverConfig.nodeUserType.value;
-          if (num.indexOf("m") !== -1) {
-            num = num.substring(2);
-          }
-          // 默认值
-          if (
-            this.approverConfig.type === nodeType.审核人 &&
-            this.approverConfig.nodeUserType.type == "manager" &&
-            !this.approverConfig.nodeUserType.value
-          ) {
-            this.approverConfig.nodeUserType.value = "主管";
-          }
-        } else {
-          this.approverConfig.nodeUserType.value = "主管";
-        }
-      }
       this.saveData();
     },
     //保存条件设置
@@ -205,6 +165,7 @@ export default {
       this.saveData();
     },
     saveData() {
+      this.approverConfig.error = !this.getBeforeSave();
       let node = this.findNode(this.approverConfig.nodeId);
       if (!node) {
         throw Error("无效节点对象");
@@ -225,9 +186,7 @@ export default {
         node[kv] = this.approverConfig[kv];
       }
       node.nodeName = this.nodeName;
-      this.closeHandle(() => {
-        this.approverDrawer = false;
-      });
+      this.approverDrawer = false;
     },
     //打开弹框
     openDrawer(data) {
@@ -236,11 +195,6 @@ export default {
       // 默认条件
       this.approverConfig = JSON.parse(JSON.stringify(data));
       this.nodeName = this.approverConfig.nodeName;
-    },
-    //关闭前校验
-    closeHandle(done) {
-      this.approverConfig.error = this.getBeforeSave();
-      done();
     },
   },
 };

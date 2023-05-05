@@ -2,7 +2,7 @@
  * @Author: 羊驼
  * @Date: 2023-04-28 14:22:39
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-05-04 17:39:03
+ * @LastEditTime: 2023-05-05 09:39:21
  * @Description: 提交人表单
 -->
 <template>
@@ -28,6 +28,42 @@
         <el-radio :label="0">指定部门</el-radio>
         <el-radio :label="1">指定成员</el-radio>
       </el-radio-group>
+      <el-form-item
+        label="部门"
+        v-if="!setting.assignMode"
+      >
+        <el-select
+          v-model="setting.department"
+          multiple
+          class="w-100"
+          value-key="id"
+        >
+          <el-option
+            v-for="item in departmentOptions"
+            :key="item.id"
+            :label="item.thirdDepartment"
+            :value="item"
+          />
+        </el-select>
+      </el-form-item>
+      <el-form-item
+        label="成员"
+        v-else
+      >
+        <el-select
+          v-model="setting.member"
+          multiple
+          value-key="user_id"
+          class="w-100"
+        >
+          <el-option
+            v-for="(item,index) in memberOptions"
+            :key="index*1000"
+            :label="item.name"
+            :value="item"
+          />
+        </el-select>
+      </el-form-item>
     </el-form-item>
     <el-form-item
       label="抄送人设置"
@@ -59,12 +95,13 @@
               v-for="(value,key) in typeOptions"
               :key="value*100"
               :label="value"
+              @change="refreshSelect"
             >{{key}}</el-radio>
           </el-radio-group>
         </el-descriptions-item>
         <el-descriptions-item
           label="配置"
-          v-if="item.type"
+          v-if="item.type&&refresh"
         >
           <el-form-item
             label="部门等级"
@@ -85,6 +122,7 @@
           >
             <el-select
               v-model="item.member"
+              multiple
               value-key="user_id"
             >
               <el-option
@@ -145,7 +183,9 @@ export default {
           firstDepartment: "研发部",
           firstDepartmentManager: "asd",
           secondDepartment: "web",
-          secondDepartmentDepartment: "asd",
+          secondDepartmentManager: "asd",
+          thirdDepartment: "web",
+          thirdDepartmentManager: "",
         },
       ],
       item: {
@@ -153,6 +193,7 @@ export default {
         level: 1, // 如果为部门负责人 选择层级
         member: [],
       },
+      refresh: true,
     };
   },
   methods: {
@@ -163,6 +204,12 @@ export default {
     },
     removeCarbon(index) {
       this.setting.carbonCopySetting.splice(index, 1);
+    },
+    refreshSelect() {
+      this.refresh = false;
+      this.$nextTick(() => {
+        this.refresh = true;
+      });
     },
   },
 };
@@ -182,6 +229,9 @@ export default {
   }
   .mb-20 {
     margin-bottom: 20px;
+  }
+  .w-100 {
+    width: 100%;
   }
 }
 </style>

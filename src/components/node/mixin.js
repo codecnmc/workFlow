@@ -2,7 +2,7 @@
  * @Author: 羊驼
  * @Date: 2023-04-25 10:34:46
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-04-27 16:57:30
+ * @LastEditTime: 2023-05-05 10:26:04
  * @Description: file content
  */
 import addNode from "../addNode";
@@ -39,9 +39,6 @@ export default {
         }
     },
     methods: {
-        placeholderList() {
-            return this.$nodeType.toString(this.nodeConfig.type)
-        },
         setApproverStr() {
             let str = this.$factory.getTypeTextHandle(
                 this.nodeConfig.type,

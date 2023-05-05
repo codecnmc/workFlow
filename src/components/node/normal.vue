@@ -2,7 +2,7 @@
  * @Author: 羊驼
  * @Date: 2023-04-25 10:32:20
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-05-04 15:52:31
+ * @LastEditTime: 2023-05-05 10:25:38
  * @Description: 审核人节点
 -->
 <template>
@@ -26,17 +26,21 @@
           ></i>
         </div>
         <div class="content">
-          <div class="text">
-            <template v-if="![$nodeType.开始,$nodeType.结束].includes(nodeConfig)">
-              <span
-                class="placeholder"
-                v-if="nodeConfig.error"
-              >
-                请选择{{ placeholderList() }}
-              </span>
-              <span v-else>{{ setApproverStr() }}</span>
-            </template>
+          <div
+            class="placeholder text"
+            v-if="nodeConfig.error"
+          >
+            请配置{{nodeConfig.nodeName}}
           </div>
+          <template v-else>
+            <div
+              v-for="(item,index) in setApproverStr()"
+              :key="index"
+              class="text"
+            >
+              {{item}}
+            </div>
+          </template>
           <div
             class="error_tip"
             v-if="isTried && nodeConfig.error"

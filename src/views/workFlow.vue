@@ -50,7 +50,7 @@ export default {
   data() {
     return {
       // 校验用
-      isTried: false,
+      isTried: true,
       // 报错的数据
       tipList: [],
       // 展示节点结构 初始化会更换为开始节点
