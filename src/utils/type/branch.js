@@ -2,7 +2,7 @@
  * @Author: 羊驼
  * @Date: 2023-04-27 14:15:11
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-04-27 15:59:13
+ * @LastEditTime: 2023-05-05 16:46:44
  * @Description: 条件分支类型
  */
 import { NodeType } from "../config"
@@ -40,15 +40,17 @@ export default class BranchType extends BaseType {
     }
 
     handleText(nodeConfig) {
+
         //条件显示
         for (var i = 0; i < nodeConfig.conditionNodes.length; i++) {
             nodeConfig.conditionNodes[i].error =
-                condition.handleText(nodeConfig.conditionNodes[i]) ==
-                "请设置条件";
+                !condition.beforeSave(nodeConfig.conditionNodes[i])
         }
 
     }
 
-    beforeSave(nodeConfig) { }
+    beforeSave(nodeConfig) {
+        return true
+    }
 
 }

@@ -2,7 +2,7 @@
  * @Author: 羊驼
  * @Date: 2023-04-25 10:57:30
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-04-28 14:02:25
+ * @LastEditTime: 2023-05-05 16:25:06
  * @Description: 分支情况
 -->
 <template>
@@ -54,7 +54,13 @@
                   @click.stop="arrTransfer(index)"
                 > &gt; </div>
                 <div class="content">
-                  {{ setConditionStr(item) }}
+                  <div
+                    class="text"
+                    v-for="(item,index2) in setConditionStr(item)"
+                    :key="index2*1000"
+                  >
+                    {{item}}
+                  </div>
                 </div>
                 <div
                   class="error_tip"

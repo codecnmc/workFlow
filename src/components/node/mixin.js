@@ -2,7 +2,7 @@
  * @Author: 羊驼
  * @Date: 2023-04-25 10:34:46
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-05-05 10:26:04
+ * @LastEditTime: 2023-05-05 16:00:46
  * @Description: file content
  */
 import addNode from "../addNode";
@@ -33,12 +33,17 @@ export default {
         if (this.value == undefined) {
             throw Error("无绑定v-model 请绑定")
         }
-        let str = this.setApproverStr()
         if (this.nodeConfig.type != this.$nodeType.条件分支) {
-            this.nodeConfig.error = str == ""
+            this.nodeConfig.error = !this.vaildError(this.nodeConfig)
         }
     },
     methods: {
+        vaildError(item) {
+            return this.$factory.getTypeBeforeSave(
+                item.type,
+                item
+            )
+        },
         setApproverStr() {
             let str = this.$factory.getTypeTextHandle(
                 this.nodeConfig.type,
@@ -51,7 +56,6 @@ export default {
                 item.type,
                 item
             )
-            item.error = str == "请设置条件"
             return str
         },
         // 删除节点

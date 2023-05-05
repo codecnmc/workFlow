@@ -87,6 +87,8 @@ export default {
       },
       // 部门等级
       levelOptions: this.$flowConfig.levelOptions,
+      operatorList: this.$flowConfig.operatorList,
+      dataFields: this.$flowConfig.dataFields,
     };
   },
   // 初始化节点

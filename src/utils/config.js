@@ -37,6 +37,9 @@ export const levelOptions = [
     },
 ]
 
+export const operatorList = ["属于", "不属于"]
+export const dataFields = [{ name: "提交人", key: "submitter" }]
+
 // 配置
 const FlowConfig = {
 
@@ -81,7 +84,9 @@ const FlowConfig = {
     ],
     // 允许条件嵌套数量
     conditionNestCount: 2,
-    levelOptions
+    levelOptions,
+    operatorList,
+    dataFields
 }
 
 Vue.prototype.$nodeType = NodeType

@@ -2,217 +2,146 @@
  * @Author: 羊驼
  * @Date: 2023-04-25 16:38:35
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-04-25 16:50:38
+ * @LastEditTime: 2023-05-05 16:54:41
  * @Description: 条件表单
 -->
 
 <template>
-  <div class="drawer-content drawer-content-condition">
+  <el-form
+    class="form"
+    label-position="top"
+  >
     <!-- 默认条件 -->
-    <div
-      v-if="defaultApprovalDrawer"
-      class="default-style"
-    >其他情况</div>
+    <div v-if="defaultApprovalDrawer">其他情况</div>
     <div v-else>
       <div
-        v-for="(item, index) in approverConfig.conditionList"
+        v-for="(conditionGroup,index) in setting.conditionList"
         :key="index"
       >
-        <div class="condition-conent-group">
-          <div class="condition-group-title flex">
-            <div class="dang-style">条件组</div>
-            <div>
-              <i
-                class="remove el-icon-delete"
-                @click="removeCondition('group', index)"
-              ></i>
-            </div>
-          </div>
-          <div
-            class="condition-group-select"
-            v-for="(it, ind) in item.conditionChildrenNodes"
-            :key="ind"
-          >
-            <div class="mg-bot-10">
-              <div
-                v-if="ind === 0"
-                class="flex flex-style"
-              >
-                <span class="dang-style">当</span>
-                <i
-                  class="remove el-icon-delete"
-                  @click=" removeCondition( 'oneCondition', index, ind ) "
-                ></i>
+        <p v-if="!index">满足以下条件时进入当前分支</p>
+        <p v-else>或满足</p>
+        <el-descriptions
+          :column="1"
+          border
+          direction="vertical"
+          class="mb-20"
+        >
+          <el-descriptions-item label="条件组">
+            <template slot="label">
+              <div class="flex">
+                <span>
+                  条件组</span>
+                <el-button
+                  type="text"
+                  :disabled="!index"
+                  icon="el-icon-delete"
+                  @click="removeGroup(index)"
+                ></el-button>
               </div>
-              <div
-                v-else
-                class="flex"
-              >
-                <el-select
-                  style="width: 110px;"
-                  v-model="it.conditionOperator"
-                  placeholder="请选择"
-                >
-                  <el-option
-                    label="且"
-                    :value="'&&'"
-                  ></el-option>
-                  <el-option
-                    label="或"
-                    :value="'||'"
-                  ></el-option>
-                </el-select>
-                <i
-                  class="remove iconfont icon-icon_viewpicture_delete"
-                  @click=" removeCondition( 'oneCondition', index, ind ) "
-                ></i>
-              </div>
-            </div>
-            <el-row
-              :gutter="5"
-              class="mg-bot-10"
+            </template>
+            <div
+              class="column"
+              v-for="(condition,index2) in conditionGroup"
+              :key="index2*1000"
             >
-              <el-col :span="8">
-                <el-select
-                  v-model="it.leftFileds"
-                  placeholder="请选择"
-                  @change="dataFieldsChange(it)"
-                >
-                  <el-option
-                    v-for="item in dataFields"
-                    :label="item.name"
-                    :value="item.key"
-                    :key="item.key"
-                  ></el-option>
-                </el-select>
-              </el-col>
-              <el-col :span="5">
-                <el-select
-                  v-model="it.centerFileds"
-                  placeholder="请选择"
-                >
-                  <el-option
-                    v-for="item in operatorList"
-                    :label="item"
-                    :value="item"
-                    :key="item"
-                  ></el-option>
-                </el-select>
-              </el-col>
-              <el-col :span="10">
-                <el-date-picker
-                  v-model="it.rightFileds"
-                  v-if="it.leftFiledsType === 'date'"
-                  type="date"
-                  placeholder="选择日期"
-                  value-format="yyyy-MM-dd"
-                >
-                </el-date-picker>
-                <el-input
-                  v-else
-                  v-model="it.rightFileds"
-                  placeholder="请输入"
-                ></el-input>
-              </el-col>
-            </el-row>
-          </div>
-          <div
-            class="conditionbtn"
-            @click="addConditionGroup('1', item)"
-          >
-            <el-button type="">
-              <i class="el-button-suffix el-icon-plus"></i>添加条件
-            </el-button>
-          </div>
-        </div>
-        <div
-          v-if=" index === 0 && approverConfig.conditionList.length > 1 "
-          class="flex"
-          style="height:54px;padding:0 24px"
-        >
-          <el-select
-            style="width: 110px;margin-top:7px"
-            v-model="item.conditionGroupOperator"
-            placeholder="请选择"
-          >
-            <el-option
-              label="且"
-              :value="'&&'"
-            ></el-option>
-            <el-option
-              label="或"
-              :value="'||'"
-            ></el-option>
-          </el-select>
-        </div>
+              <div class="flex">
+                <span>{{index2==0?"当":"且"}}</span>
+                <el-button
+                  type="text"
+                  v-if="conditionGroup.length>1"
+                  icon="el-icon-delete"
+                  @click="removeCondition(index,index2)"
+                ></el-button>
+              </div>
+              <el-select v-model="condition.key">
+                <el-option
+                  v-for="item in dataFields"
+                  :key="item.key"
+                  :label="item.name"
+                  :value="item.key"
+                />
+              </el-select>
+              <el-select v-model="condition.operator">
+                <el-option
+                  v-for="item in operatorList"
+                  :key="item"
+                  :label="item"
+                  :value="item"
+                />
+              </el-select>
+              <el-select
+                v-model="condition.value"
+                multiple
+                filterable
+                placeholder="请选择指定成员"
+                value-key="user_id"
+              >
+                <el-option
+                  v-for="item in memberOptions"
+                  :key="item.user_id"
+                  :label="item.name"
+                  :value="item"
+                />
+              </el-select>
+            </div>
+            <el-button
+              icon="el-icon-plus"
+              type="text"
+              @click="pushCondition(index)"
+            >添加条件</el-button>
+          </el-descriptions-item>
+        </el-descriptions>
       </div>
-      <div class="conditionbtn">
-        <el-button
-          type=""
-          @click="addConditionGroup('0')"
-        >
-          <i class="el-button-suffix el-icon-plus"></i>添加条件组
-        </el-button>
-      </div>
+      <el-button
+        icon="el-icon-plus"
+        class="w-100"
+        size="small"
+        @click="addGroup"
+      >添加条件组</el-button>
     </div>
-  </div>
+  </el-form>
 </template>
 
 <script>
 import mixin from "./mixin";
 export default {
   props: ["defaultApprovalDrawer"],
+  inject: ["operatorList", "dataFields"],
   mixins: [mixin],
-  data() {
-    return {
-      operatorList: ["=", "!=", ">", ">=", "<", "<="],
-      dataFields: [
-        { name: "日期", key: "date", type: "date" },
-        { name: "地址", key: "adress" },
-        { name: "状态", key: "state" },
-      ],
-    };
-  },
   methods: {
-    //添加条件组
-    addConditionGroup(flag, item) {
-      if (flag === "1") {
-        item.conditionChildrenNodes.push({
-          conditionOperator: "",
-          leftFileds: "",
-          centerFileds: "",
-          rightFileds: "",
-        });
-        return;
-      }
-      this.approverConfig.conditionList.push({
-        conditionChildrenNodes: [],
-        conditionGroupOperator: "",
+    pushCondition(index) {
+      this.setting.conditionList[index].push({
+        operator: this.operatorList[0],
+        key: "",
+        value: [],
       });
     },
-    //删除条件组和条件
-    removeCondition(conditonflag, index, ind) {
-      if (conditonflag === "group") {
-        this.approverConfig.conditionList.splice(index, 1);
-        return;
-      }
-      this.approverConfig.conditionList[index].conditionChildrenNodes.splice(
-        ind,
-        1
-      );
+    removeCondition(index, index2) {
+      this.setting.conditionList[index].splice(index2, 1);
     },
-    //条件字段显示name
-    dataFieldsChange(it) {
-      this.dataFields.forEach((item) => {
-        if (item.key === it.leftFileds) {
-          this.$set(it, "leftFiledsName", item.name);
-          this.$set(it, "leftFiledsType", item.type);
-        }
-      });
+    removeGroup(index) {
+      this.setting.conditionList.splice(index, 1);
+    },
+    addGroup() {
+      this.setting.conditionList.push([
+        { operator: this.operatorList[0], key: "", value: [] },
+      ]);
     },
   },
 };
 </script>
 
 <style lang="less" scoped>
+.column {
+  display: grid;
+  grid-template-rows: 1;
+  row-gap: 10px;
+  margin-bottom: 10px;
+}
+.flex {
+  display: flex;
+  align-items: center;
+  height: 30px;
+  justify-content: space-between;
+}
 </style>

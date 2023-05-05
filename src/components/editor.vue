@@ -2,7 +2,7 @@
  * @Author: 羊驼
  * @Date: 2023-04-27 11:47:24
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-05-05 11:20:01
+ * @LastEditTime: 2023-05-05 15:24:23
  * @Description: 节点编辑器
 -->
 <template>
@@ -116,52 +116,7 @@ export default {
     },
     //保存弹框设置
     saveApprover() {
-      let nodeType = this.$nodeType;
       this.approverDrawer = false;
-      if (this.approverConfig.type === nodeType.条件) {
-        return this.saveCondition();
-      }
-      this.saveData();
-    },
-    //保存条件设置
-    saveCondition() {
-      this.approverDrawer = false;
-      let conditionString = ""; // 后端要的数据
-      let conditionStringName = ""; //前端显示
-      //条件循环设置
-      if (this.approverConfig.conditionList.length > 0) {
-        this.approverConfig.conditionList.forEach((item, indx) => {
-          if (
-            item.conditionChildrenNodes &&
-            item.conditionChildrenNodes.length > 0
-          ) {
-            item.conditionChildrenNodes.forEach((it, ind) => {
-              conditionString =
-                conditionString +
-                it.conditionOperator +
-                it.leftFileds +
-                it.centerFileds +
-                it.rightFileds;
-              conditionStringName =
-                conditionStringName +
-                it.conditionOperator +
-                it.leftFiledsName +
-                it.centerFileds +
-                it.rightFileds;
-            });
-          }
-          conditionString = conditionString + item.conditionGroupOperator;
-          conditionStringName =
-            conditionStringName + item.conditionGroupOperator;
-        });
-      }
-      this.approverConfig.conditionString = conditionString;
-      this.approverConfig.conditionStringName = conditionStringName;
-      this.approverConfig.error =
-        this.$factory.getTypeTextHandle(
-          this.approverConfig.type,
-          this.approverConfig
-        ) == "请设置条件";
       this.saveData();
     },
     saveData() {
