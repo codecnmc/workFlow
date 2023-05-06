@@ -18,7 +18,7 @@ npm run build
 ### 节点基础结构组成
 
 ```javascript
-  			nodeName: "开始",  	// 节点名称
+  					nodeName: "开始",  	// 节点名称
             error: true,      	// 是否有误
             type: this.type,  	// 节点类型
             nodeId: getUUID(),	// 节点id
@@ -254,11 +254,21 @@ export default class StartType extends BaseType {
 
 #### 注意事项
 1.创建新的node节点与form的表单的vue文件 请手动混入对应文件夹下的mixin.js
+
 2.form表单混入后提供字段 approverConfig 节点数据 setting 配置数据 可读写
+
 3.node节点混入后提供nodeConfig 当前节点数据 可读写
 
 ### 提供获取数据方法
-...编写中
+
+请使用ref设置示例调用以下方法
+
+|方法名称 | 返回值类型| 解释  |
+|--|--|--|
+| importData | void | 调用文件选取框 导入数据方法 |
+| exportData | void | 导出json数据文件下载方法 |
+| loadData | void | 传入nodeConfig数据初始化 不调用文件选取框 |
+| exportStruct | Object | 导出跳表字典与节点数据 |
 
 ### 效果图
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/c86e02c38ead4acbaa53fa23eeaa8c36.png)

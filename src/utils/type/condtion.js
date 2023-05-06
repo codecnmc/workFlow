@@ -2,7 +2,7 @@
  * @Author: 羊驼
  * @Date: 2023-04-27 14:15:11
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-05-05 17:06:27
+ * @LastEditTime: 2023-05-06 10:09:37
  * @Description: 条件类型
  */
 import { NodeType, dataFields } from "../config"
@@ -51,9 +51,8 @@ export default class ConditionType extends BaseType {
         let text = []
         let setting = nodeConfig.setting
         setting.conditionList.forEach((group, i) => {
-            text.push(`${!i ? '当' : '或'}`)
             group.forEach((condition, j) => {
-                text.push(`${j > 0 ? "且" : ""}${this.dic.get(condition.key)}${condition.operator}${condition.value.map((x) => x.name).toString()}`)
+                text.push(`${j > 0 ? "且" : `${!i ? '当' : '或'}`}${this.dic.get(condition.key)}${condition.operator}${condition.value.map((x) => x.name).toString()}`)
             })
         })
         return text.length > 0 && text || [nodeConfig.priorityLevel ? "请设置条件" : "未满足时其他条件时，将进入默认流程"]

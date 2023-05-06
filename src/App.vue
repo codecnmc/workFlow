@@ -1,12 +1,12 @@
 <template>
-  <div>
-    <router-view />
-  </div>
+  <work-flow></work-flow>
 </template>
 
 <script>
+import workFlow from "./views/workFlow.vue";
 
 export default {
-  name: 'App',
-}
+  components: { workFlow },
+  name: "App",
+};
 </script>

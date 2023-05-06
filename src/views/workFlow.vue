@@ -1,11 +1,19 @@
 <template>
   <div class="workflow">
-    <div class="header">
-      <el-button
-        type="primary"
-        class="btn-style"
-        @click="validate"
-      >校验</el-button>
+    <div
+      class="header"
+      v-if="needHeader"
+    >
+      <div class="btn-style">
+        <el-button
+          type="primary"
+          @click="exportData"
+        >导出数据</el-button>
+        <el-button
+          type="success"
+          @click="importData"
+        >导入数据</el-button>
+      </div>
       <div class="zoom flex">
         <div
           class="zoom-out"
@@ -20,7 +28,10 @@
         ></div>
       </div>
     </div>
-    <div class="approval-flow fd-nav-content">
+    <div
+      class="approval-flow fd-nav-content"
+      :style="{top:`${needHeader?'60px':'0px'}`}"
+    >
       <div class="dingflow-design">
         <div
           class="box-scale"
@@ -43,6 +54,12 @@
 import Editor from "../components/editor.vue";
 import nodeWrap from "../components/nodeWrap.vue";
 export default {
+  props: {
+    needHeader: {
+      type: Boolean,
+      default: false,
+    },
+  },
   components: {
     nodeWrap,
     Editor,
@@ -105,6 +122,85 @@ export default {
     );
   },
   methods: {
+    // 导入数据
+    async importData() {
+      let input = null;
+      let data = await new Promise((resolve, reject) => {
+        input = document.createElement("input");
+        input.value = "选择文件";
+        input.type = "file";
+        input.onchange = (event) => {
+          let file = event.target.files[0];
+          let file_reader = new FileReader();
+          file_reader.onload = () => {
+            let fc = file_reader.result;
+            resolve(fc); // 返回文件文本内容到Promise
+          };
+          file_reader.readAsText(file, "UTF-8");
+        };
+        input.click();
+      });
+      //  数据处理
+      try {
+        data = JSON.parse(data);
+        this.loadData(data.nodeConfig);
+      } catch (err) {
+        throw Error("序列化导入数据失败 请仔细检查数据");
+      }
+    },
+    // 读取数据
+    loadData(data) {
+      this.nodeConfig = data;
+    },
+    // 导出的结构数据
+    exportStruct() {
+      return {
+        nodeConfig: this.nodeConfig,
+        skip: this.handleSkipTable(),
+      };
+    },
+    // 导出数据
+    exportData() {
+      if (this.validate()) {
+        let data = this.exportStruct();
+        var elementA = document.createElement("a");
+        //文件的名称为时间戳加文件名后缀
+        elementA.download = `flowData.json`;
+        elementA.style.display = "none";
+        //生成一个blob二进制数据，内容为json数据
+        var blob = new Blob([JSON.stringify(data)]);
+        //生成一个指向blob的URL地址，并赋值给a标签的href属性
+        elementA.href = URL.createObjectURL(blob);
+        document.body.appendChild(elementA);
+        elementA.click();
+        document.body.removeChild(elementA);
+      } else {
+        console.log(this.tipList);
+        this.$message.error("存在错误情况 无法导出数据");
+      }
+    },
+    // 处理跳表问题 仅后端处理使用的数值 前端无作用
+    handleSkipTable() {
+      let skipTable = {};
+      let flatData = this.getFlatDic();
+      for (let kv in flatData) {
+        let item = flatData[kv];
+        if (item.type == this.$nodeType.分支跳出) {
+          let node = flatData[item.fatherID];
+          let first = false;
+          while (node) {
+            if (node.type == this.$nodeType.条件分支 && first) {
+              skipTable[item.nodeId] = node.nodeId;
+              break;
+            } else if (node.type == this.$nodeType.条件分支) {
+              first = true;
+            }
+            node = flatData[node.fatherID];
+          }
+        }
+      }
+      return skipTable;
+    },
     // 查找节点
     findNode(id) {
       let dic = this.getFlatDic();
@@ -157,10 +253,11 @@ export default {
       if (data.childNode) {
         this.reErr(data.childNode);
         if (data.childNode.type != nodeType.条件分支) {
-          this.tipList.push({
-            name: data.childNode.nodeName,
-            type: nodeType.toString(data.childNode.type),
-          });
+          data.childNode.error &&
+            this.tipList.push({
+              name: data.childNode.nodeName,
+              type: nodeType.toString(data.childNode.type),
+            });
         } else {
           for (var i = 0; i < data.childNode.conditionNodes.length; i++) {
             if (data.childNode.conditionNodes[i].error) {

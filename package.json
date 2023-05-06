@@ -1,6 +1,6 @@
 {
-  "name": "work-flow",
-  "version": "0.1.0",
+  "name": "yt-workflow",
+  "version": "0.0.1",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -14,8 +14,7 @@
     "less-loader": "^5.0.0",
     "style-loader": "^3.2.1",
     "uuid": "^9.0.0",
-    "vue": "^2.6.11",
-    "vue-router": "^3.5.2"
+    "vue": "^2.6.11"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",

@@ -78,16 +78,14 @@ export default {
         }
       }
 
-      // TODO 分支跳出检测的问题 如果childNode存在 而且下面没有分支跳出 要补充上 后续要计算分支跳出连接的点 方便后续后端操作
-      if (level > 1 && type == branch) {
-        if (!this.nodeConfig.childNode) {
-          this.nodeConfig.childNode = this.$factory.getStruct(
-            this.nodeConfig && this.nodeConfig.nodeId,
-            this.$nodeType.分支跳出,
-            null,
-            level
-          );
-        }
+      //  分支跳出检测的问题 如果childNode存在 而且下面没有分支跳出 要补充上 后续要计算分支跳出连接的点 方便后续后端操作
+      if (level > 1 && type == branch && !this.nodeConfig.childNode) {
+        this.nodeConfig.childNode = this.$factory.getStruct(
+          this.nodeConfig && this.nodeConfig.nodeId,
+          this.$nodeType.分支跳出,
+          null,
+          level
+        );
       }
 
       let data = this.$factory.getStruct(
