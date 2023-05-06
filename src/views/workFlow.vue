@@ -115,7 +115,7 @@ export default {
       }
     },
     // 处理数组的问题 由于现在尾部缺失东西 导致会有点问题
-    conditionNodesHnalde(array, dic) {
+    conditionNodesHandle(array, dic) {
       array.forEach((node) => {
         dic[node.nodeId] = node;
         node.childNode && this.flatData(node.childNode, dic);
@@ -130,16 +130,18 @@ export default {
     // 递归平铺所有节点 方便于节点的操作
     flatData(data, dic) {
       if (!data) return;
+      if (data.nodeId) {
+        dic[data.nodeId] = data;
+      }
       if (data.childNode) {
         dic[data.childNode.nodeId] = data.childNode;
         this.flatData(data.childNode, dic);
         data.childNode.conditionNodes &&
           data.childNode.conditionNodes.length > 0 &&
-          this.conditionNodesHnalde(data.childNode.conditionNodes, dic);
+          this.conditionNodesHandle(data.childNode.conditionNodes, dic);
       }
       if (data.conditionNodes && data.conditionNodes.length > 0) {
-        dic[data.nodeId] = data;
-        this.conditionNodesHnalde(data.conditionNodes, dic);
+        this.conditionNodesHandle(data.conditionNodes, dic);
       }
     },
     // 保存前校验数据
