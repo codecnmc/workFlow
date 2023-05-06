@@ -2,7 +2,7 @@
  * @Author: 羊驼
  * @Date: 2023-04-27 14:15:11
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-04-27 14:42:45
+ * @LastEditTime: 2023-05-06 15:09:16
  * @Description: 审核人类型
  */
 import { NodeType } from "../config"
@@ -24,11 +24,8 @@ export default class ExecuteType extends BaseType {
             error: true,
             type: this.type,
             nodeId: getUUID(),
-            nodeUserType: {
-                type: "manager",
-                value: "m-1",
-                valueName: "第一级主管",
-                valueList: [],
+            setting: {
+
             },
             childNode,
             fatherID,
