@@ -41,7 +41,7 @@
 <script>
 export default {
   props: ["value", "tip"],
-  inject: ["openDrawer"],
+  inject: ["openDrawer","getFlatRoot"],
   data() {
     return {
       visible: false,
@@ -70,9 +70,20 @@ export default {
       // console.log(this.nodeConfig);
       let level = this.nodeConfig.level;
       let branch = this.$nodeType.条件分支;
+      let flatDic = this.getFlatRoot();
+
       // 解决条件嵌套导向的问题
-      if (type == branch && this.nodeConfig.type == this.$nodeType.条件) {
-        level += 1;
+      if (type == branch) {
+        let lastCondition = 0;
+        let currentNode = this.nodeConfig;
+        while (currentNode) {
+          if (currentNode.type == this.$nodeType.条件) {
+            lastCondition = currentNode.level;
+            break;
+          }
+          currentNode = flatDic[currentNode.fatherID];
+        }
+        level = lastCondition + 1;
         if (level >= this.$flowConfig.conditionNestCount + 1) {
           return this.$message.error("已超过最大嵌套限制数量");
         }

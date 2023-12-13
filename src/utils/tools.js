@@ -2,7 +2,7 @@
  * @Author: 羊驼
  * @Date: 2023-04-27 09:28:34
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-05-05 11:49:53
+ * @LastEditTime: 2023-12-13 17:01:05
  * @Description: 帮助方法
  */
 import { NodeType, levelOptions } from "./config"
@@ -33,12 +33,14 @@ export function nodeOffset(nodeConfig, flatDic) {
                 return "240px"
             }
             if (node.type == NodeType.条件) {
-                return "0px"
+                let childNode = nodeConfig.childNode && nodeConfig.childNode.type == NodeType.条件分支
+                return childNode ? "240px" : "0px"
             }
             node = flatDic[node.fatherID]
         }
         return "190px"
     }
+
     return "0px";
 }
 
