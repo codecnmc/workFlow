@@ -1,12 +1,6 @@
 <template>
   <div class="nodeflow-components">
-    <div
-      class="flex"
-      @dragend.stop="drop"
-      :draggable="![this.$nodeType.开始, this.$nodeType.结束].includes(nodeConfig.type)"
-      @dragstart.stop="dragStart"
-      @dragenter.stop="dragEnter"
-    >
+    <div class="flex">
       <component
         :is="getComponent"
         :isTried.sync="isTried"
@@ -153,6 +147,7 @@ export default {
     },
     dragStart(e) {
       this.dragID = this.nodeConfig.nodeId;
+      console.log(this.nodeConfig);
       this.hoverNode = "";
     },
   },
