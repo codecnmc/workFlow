@@ -2,24 +2,25 @@
  * @Author: 羊驼
  * @Date: 2023-04-25 10:57:30
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-12-13 17:06:24
+ * @LastEditTime: 2024-02-27 15:38:40
  * @Description: 分支情况
 -->
 <template>
 
   <div class="branch-wrap">
-    <div
-      class="branch-box-wrap"
-      :style="{'margin-left':condtionsOffset}"
-    >
+    <div class="branch-box-wrap">
       <div class="branch-box">
-        <button
+        <el-button
+          type="primary"
+          plain
+          round
+          size="small"
           class="add-branch"
           @click="addTerm"
-          :style="`margin-left:${conditionButtonOffset}`"
+
         >
           添加条件
-        </button>
+        </el-button>
         <div
           class="col-box"
           v-for="(item, index) in nodeConfig.conditionNodes"
@@ -104,10 +105,7 @@
           ></div>
         </div>
       </div>
-      <addNode
-        v-model="nodeConfig"
-        :style="`margin-left:${condtionAddButton}`"
-      ></addNode>
+      <addNode v-model="nodeConfig"></addNode>
     </div>
   </div>
 </template>
@@ -119,49 +117,6 @@ import { getMaxLevel } from "@/utils/tools.js";
 export default {
   mixins: [mixin],
   computed: {
-    // 条件分支偏移量
-    condtionsOffset() {
-      let nodeLength = this.nodeConfig.conditionNodes.length;
-      let offset = 0;
-      let count = this.nodeConfig.level - 1;
-      if (this.nodeConfig.level > 2) {
-        count -= 1;
-      }
-      offset = 240 * count;
-
-      if (nodeLength > 5) {
-        // 1080p下 五个极限了 再靠左就遮住了 所以往右偏移一点
-        return -240 - 3 * 190 + offset + "px";
-      }
-      if (this.nodeConfig.level == 1 && !this.findChildIsBranch()) {
-        offset = 190;
-      }
-      let branchCount = this.getBranchConditionsOffset();
-      return (
-        -240 -
-        branchCount -
-        (this.nodeConfig.conditionNodes.length - 2) * 190 +
-        offset +
-        "px"
-      );
-    },
-    // 条件分支添加条件按钮偏移量
-    conditionButtonOffset() {
-      let nodeLength = this.nodeConfig.conditionNodes.length;
-      if (nodeLength > 5) {
-        return -(nodeLength - 5) * 190 + "px";
-      }
-      return 0;
-    },
-    // 解决条件分支添加按钮偏移量
-    condtionAddButton() {
-      let nodeLength = this.nodeConfig.conditionNodes.length;
-      let offset = 0;
-      if (nodeLength > 5) {
-        return -(nodeLength - 5) * 380 + "px";
-      }
-      return offset;
-    },
     // 条件节点
     conditions: {
       get() {
@@ -173,27 +128,6 @@ export default {
     },
   },
   methods: {
-    // 如果条件嵌套了分支 偏移量应该会增加
-    getBranchConditionsOffset() {
-      let branchCount = 0;
-      for (let i = 0; i < this.nodeConfig.conditionNodes.length; i++) {
-        let item = this.nodeConfig.conditionNodes[i];
-        while (item.childNode) {
-          if (item.childNode.type == this.$nodeType.条件分支) {
-            branchCount++;
-          }
-          item = item.childNode;
-        }
-      }
-      switch (branchCount) {
-        case 1:
-          return 0;
-        case 2:
-          return 190;
-        default:
-          return 0;
-      }
-    },
     // 查找是否有条件节点嵌套了条件分支
     findChildIsBranch() {
       let level = getMaxLevel(this.getFlatRoot());
@@ -276,19 +210,21 @@ export default {
           }
         }
         let node = this.conditions[0].childNode;
-        // 2023.12.13修复没有更新父id的问题
-        node.fatherID = this.nodeConfig.fatherID;
-        while (node) {
-          let item = node.childNode;
-          if (!item) {
-            break;
+        if (node) {
+          // 2023.12.13修复没有更新父id的问题
+          node.fatherID = this.nodeConfig.fatherID;
+          while (node) {
+            let item = node.childNode;
+            if (!item) {
+              break;
+            }
+            if (item.type == this.$nodeType.分支跳出) {
+              node.childNode = null;
+            }
+            node = item;
           }
-          if (item.type == this.$nodeType.分支跳出) {
-            node.childNode = null;
-          }
-          node = item;
+          this.$emit("input", this.conditions[0].childNode);
         }
-        this.$emit("input", this.conditions[0].childNode);
       }
     },
     // 递归续接链表

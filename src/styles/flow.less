@@ -49,45 +49,24 @@
     right   : 60px;
 }
 
+.workflow {
+    width: 100%;
+}
+
 .approval-flow {
     .dingflow-design {
         padding-top   : 20px;
         padding-bottom: 100px;
 
         .box-scale {
-            transform       : scale(1);
-            display         : inline-block;
-            position        : relative;
-            width           : 100%;
-            // padding: 54.5px 0;
-            transform-origin: 0 0 0;
-            left            : 40%;
-
-            .branch-wrap {
-                .branch-box-wrap {
-                    margin-left: -240px;
-
-                    .auto-judge {
-                        position     : relative;
-                        width        : 280px;
-                        min-height   : 100px;
-                        background   : #fff;
-                        border-radius: 4px;
-                        cursor       : pointer;
-
-                        .title-wrapper {
-                            position     : relative;
-                            font-size    : 12px;
-                            color        : #333;
-                            text-align   : left;
-                            height       : 38px;
-                            line-height  : 38px;
-                            padding      : 0 13px 0 0px;
-                            border-bottom: 1px solid #ebebeb;
-                        }
-                    }
-                }
-            }
+            display        : inline-block;
+            position       : relative;
+            width          : 100%;
+            padding        : 54.5px 0px;
+            align-items    : flex-start;
+            justify-content: center;
+            flex-wrap      : wrap;
+            min-width      : min-content;
 
             .node-wrap-box {
                 display       : inline-flex;
@@ -95,9 +74,11 @@
                 position      : relative;
                 width         : 280px;
                 min-height    : 72px;
-                background    : #fff;
+                flex-shrink   : 0;
+                background    : rgb(255, 255, 255);
                 border-radius : 4px;
                 cursor        : pointer;
+                box-shadow    : 0 2px 5px 0 rgba(0, 0, 0, 0.1);
             }
 
             .node-wrap-box:after {
@@ -189,146 +170,6 @@
     // width: 100%;
 }
 
-.dingflow-design .branch-box-wrap {
-    display              : flex;
-    -webkit-box-orient   : vertical;
-    -webkit-box-direction: normal;
-    -ms-flex-direction   : column;
-    flex-direction       : column;
-    -ms-flex-wrap        : wrap;
-    flex-wrap            : wrap;
-    -webkit-box-align    : center;
-    -ms-flex-align       : center;
-    align-items          : center;
-    min-height           : 270px;
-    width                : 100%;
-    -ms-flex-negative    : 0;
-    flex-shrink          : 0;
-}
-
-.dingflow-design .branch-box {
-    display      : flex;
-    overflow     : visible;
-    min-height   : 180px;
-    height       : auto;
-    border-bottom: 1px solid #ebebeb;
-    border-top   : 1px solid #ebebeb;
-    position     : relative;
-    margin-top   : 15px;
-}
-
-.dingflow-design .branch-box .col-box:before {
-    content         : "";
-    position        : absolute;
-    top             : 0;
-    left            : 0;
-    right           : 0;
-    bottom          : 0;
-    z-index         : 0;
-    margin          : auto;
-    width           : 1px;
-    height          : 100%;
-    background-color: #ebebeb;
-}
-
-.dingflow-design .add-branch {
-    border            : none;
-    outline           : none;
-    user-select       : none;
-    justify-content   : center;
-    font-size         : 12px;
-    padding           : 0 10px;
-    height            : 30px;
-    line-height       : 30px;
-    border-radius     : 15px;
-    color             : #4880ff;
-    background        : #fff;
-    box-shadow        : 0 2px 4px 0 rgba(0, 0, 0, 0.1);
-    position          : absolute;
-    top               : -16px;
-    left              : 50%;
-    transform         : translateX(-50%);
-    transform-origin  : center center;
-    cursor            : pointer;
-    z-index           : 1;
-    display           : inline-flex;
-    align-items       : center;
-    -webkit-transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
-    transition        : all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
-}
-
-.dingflow-design .add-branch:hover {
-    transform : translateX(-50%) scale(1.1);
-    box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.1);
-}
-
-.dingflow-design .add-branch:active {
-    transform : translateX(-50%);
-    box-shadow: none;
-}
-
-.dingflow-design .col-box {
-    display              : inline-flex;
-    -webkit-box-orient   : vertical;
-    -webkit-box-direction: normal;
-    flex-direction       : column;
-    -webkit-box-align    : center;
-    align-items          : center;
-    position             : relative;
-}
-
-.dingflow-design .condition-node {
-    min-height: 220px;
-}
-
-.dingflow-design .condition-node,
-.dingflow-design .condition-node-box {
-    display              : inline-flex;
-    -webkit-box-orient   : vertical;
-    -webkit-box-direction: normal;
-    flex-direction       : column;
-    -webkit-box-flex     : 1;
-}
-
-.dingflow-design .condition-node-box {
-    padding-top      : 30px;
-    padding-right    : 50px;
-    padding-left     : 50px;
-    -webkit-box-pack : center;
-    justify-content  : center;
-    -webkit-box-align: center;
-    align-items      : center;
-    flex-grow        : 1;
-    position         : relative;
-}
-
-.dingflow-design .condition-node-box:before {
-    content         : "";
-    position        : absolute;
-    top             : 0;
-    left            : 0;
-    right           : 0;
-    bottom          : 0;
-    margin          : auto;
-    width           : 1px;
-    height          : 100%;
-    background-color: #ebebeb;
-}
-
-.dingflow-design .auto-judge:after {
-    pointer-events: none;
-    content       : "";
-    position      : absolute;
-    top           : 0;
-    bottom        : 0;
-    left          : 0;
-    right         : 0;
-    z-index       : 2;
-    border-radius : 4px;
-    border        : 1px solid transparent;
-    transition    : all 0.1s cubic-bezier(0.645, 0.045, 0.355, 1);
-    box-shadow    : 0 2px 5px 0 rgba(0, 0, 0, 0.1);
-}
 
 .dingflow-design .auto-judge.active:after,
 .dingflow-design .auto-judge:active:after,
@@ -453,7 +294,6 @@
     flex-shrink     : 0;
     -webkit-box-flex: 1;
     flex-grow       : 1;
-    // margin-left: -55px;
 }
 
 .dingflow-design .add-node-btn .btn {
@@ -468,7 +308,6 @@
     line-height       : 30px;
     -webkit-transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
     transition        : all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
-    // margin-left: 36px;
 }
 
 .dingflow-design .add-node-btn .btn .iconfont {
@@ -609,6 +448,183 @@
 .start-node.node-wrap-box .content .text {
     display    : block;
     white-space: nowrap;
+}
+
+.node-wrap {
+    display        : inline-flex;
+    width          : 100%;
+    flex-flow      : column wrap;
+    justify-content: flex-start;
+    align-items    : center;
+    padding        : 0px 50px;
+    position       : relative;
+    z-index        : 1;
+}
+
+.add-node-btn-box {
+    width      : 240px;
+    display    : inline-flex;
+    flex-shrink: 0;
+    position   : relative;
+    z-index    : 1;
+}
+
+.add-node-btn-box:before {
+    content         : "";
+    position        : absolute;
+    top             : 0px;
+    left            : 0px;
+    right           : 0px;
+    bottom          : 0px;
+    z-index         : -1;
+    margin          : auto;
+    width           : 2px;
+    height          : 100%;
+    background-color: rgb(202, 202, 202);
+}
+
+.add-node-btn {
+    user-select    : none;
+    width          : 240px;
+    padding        : 20px 0px 32px;
+    display        : flex;
+    justify-content: center;
+    flex-shrink    : 0;
+    flex-grow      : 1;
+}
+
+.add-branch {
+    justify-content : center;
+    padding         : 0px 10px;
+    position        : absolute;
+    top             : -16px;
+    left            : 50%;
+    transform       : translateX(-50%);
+    transform-origin: center center;
+    z-index         : 1;
+    display         : inline-flex;
+    align-items     : center;
+}
+
+.branch-wrap {
+    display: inline-flex;
+    width  : 100%;
+}
+
+.branch-box-wrap {
+    display    : flex;
+    flex-flow  : column wrap;
+    align-items: center;
+    min-height : 270px;
+    width      : 100%;
+    flex-shrink: 0;
+}
+
+.col-box {
+    display         : inline-flex;
+    flex-direction  : column;
+    align-items     : center;
+    position        : relative;
+    background-color: #f5f8ff;
+}
+
+.branch-box {
+    display      : flex;
+    overflow     : visible;
+    min-height   : 180px;
+    height       : auto;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    border-top   : 1px solid rgba(0, 0, 0, 0.05);
+    position     : relative;
+    margin-top   : 15px;
+}
+
+.branch-box .col-box::before {
+    content         : "";
+    position        : absolute;
+    top             : 0px;
+    left            : 0px;
+    right           : 0px;
+    bottom          : 0px;
+    z-index         : 0;
+    margin          : auto;
+    width           : 1px;
+    height          : 100%;
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.condition-node {
+    display       : inline-flex;
+    flex-direction: column;
+    min-height    : 220px;
+}
+
+.condition-node-box {
+    padding-top    : 30px;
+    padding-right  : 50px;
+    padding-left   : 50px;
+    justify-content: center;
+    align-items    : center;
+    flex-grow      : 1;
+    position       : relative;
+    display        : inline-flex;
+    flex-direction : column;
+}
+
+.auto-judge {
+    position     : relative;
+    width        : 280px;
+    min-height   : 100px;
+    background   : #fff;
+    border-radius: 4px;
+    cursor       : pointer;
+
+    .title-wrapper {
+        position     : relative;
+        font-size    : 12px;
+        color        : #333;
+        text-align   : left;
+        height       : 38px;
+        line-height  : 38px;
+        padding      : 0 13px 0 0px;
+        border-bottom: 1px solid #ebebeb;
+    }
+}
+
+.auto-judge:after {
+    pointer-events: none;
+    content       : "";
+    position      : absolute;
+    top           : 0;
+    bottom        : 0;
+    left          : 0;
+    right         : 0;
+    z-index       : 2;
+    border-radius : 4px;
+    transition    : all 0.1s;
+}
+
+.auto-judge:hover:after {
+    border    : 1px solid #3296fa;
+    box-shadow: 0 0 6px 0 rgba(50, 150, 250, 0.3);
+}
+
+.node-wrap-box:after {
+    pointer-events: none;
+    content       : "";
+    position      : absolute;
+    top           : 0;
+    bottom        : 0;
+    left          : 0;
+    right         : 0;
+    z-index       : 2;
+    border-radius : 4px;
+    transition    : all 0.1s;
+}
+
+.node-wrap-box:hover:after {
+    border    : 1px solid #3296fa;
+    box-shadow: 0 0 6px 0 rgba(50, 150, 250, 0.3);
 }
 
 // editor的样式

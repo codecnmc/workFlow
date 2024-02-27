@@ -2,7 +2,7 @@
  * @Author: 羊驼
  * @Date: 2023-04-25 10:32:20
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-05-05 10:25:38
+ * @LastEditTime: 2024-02-27 15:02:04
  * @Description: 审核人节点
 -->
 <template>
@@ -10,7 +10,6 @@
     <div
       class="node-wrap-box"
       v-if="nodeConfig"
-      :style="`margin-left:${offset}`"
       :class="(isTried && nodeConfig.error ? 'active error' : '') "
     >
       <div @click="openDrawer(nodeConfig)">
@@ -55,7 +54,6 @@
     </div>
     <addNode
       v-model="nodeConfig"
-      :style="`margin-left:${offset}`"
       v-if="nodeConfig.type!=$nodeType.结束"
     ></addNode>
   </div>
@@ -63,15 +61,8 @@
 
 <script>
 import mixin from "./mixin";
-import { nodeOffset } from "@/utils/tools.js";
 export default {
   mixins: [mixin],
-  computed: {
-    offset() {
-      let dic = this.getFlatRoot();
-      return nodeOffset(this.nodeConfig, dic);
-    },
-  },
 };
 </script>
 

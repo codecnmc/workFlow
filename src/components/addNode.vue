@@ -41,7 +41,7 @@
 <script>
 export default {
   props: ["value", "tip"],
-  inject: ["openDrawer","getFlatRoot"],
+  inject: ["openDrawer", "getFlatRoot"],
   data() {
     return {
       visible: false,
@@ -84,9 +84,9 @@ export default {
           currentNode = flatDic[currentNode.fatherID];
         }
         level = lastCondition + 1;
-        if (level >= this.$flowConfig.conditionNestCount + 1) {
-          return this.$message.error("已超过最大嵌套限制数量");
-        }
+        // if (level >= this.$flowConfig.conditionNestCount + 1) {
+        //   return this.$message.error("已超过最大嵌套限制数量");
+        // }
       }
 
       //  分支跳出检测的问题 如果childNode存在 而且下面没有分支跳出 要补充上 后续要计算分支跳出连接的点 方便后续后端操作
@@ -147,6 +147,21 @@ export default {
 }
 .img-style {
   width: 36px;
+}
+.btn {
+  outline: none;
+  cursor: pointer;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+  width: 30px;
+  height: 30px;
+  background: #4880ff;
+  border-radius: 50%;
+  position: relative;
+  border: none;
+  line-height: 30px;
+  -webkit-transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+  transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+  // margin-left: 36px;
 }
 .add-node-popover {
   padding: 14px 26px;

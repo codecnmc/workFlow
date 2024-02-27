@@ -1,6 +1,7 @@
 <template>
   <div class="nodeflow-components">
     <div
+      class="flex"
       @dragend.stop="drop"
       :draggable="![this.$nodeType.开始, this.$nodeType.结束].includes(nodeConfig.type)"
       @dragstart.stop="dragStart"
@@ -98,9 +99,7 @@ export default {
       let flatData = this.getFlatRoot();
       let father = flatData[flatData[this.dragID].fatherID];
       let hoverNode = flatData[this.hoverNode];
-      if (
-        [this.$nodeType.结束].includes(hoverNode.type)
-      ) {
+      if ([this.$nodeType.结束].includes(hoverNode.type)) {
         return clear();
       }
       let childNode = hoverNode.childNode;

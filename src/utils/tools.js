@@ -2,10 +2,10 @@
  * @Author: 羊驼
  * @Date: 2023-04-27 09:28:34
  * @LastEditors: 羊驼
- * @LastEditTime: 2023-12-13 17:01:05
+ * @LastEditTime: 2024-02-27 14:59:25
  * @Description: 帮助方法
  */
-import { NodeType, levelOptions } from "./config"
+import { NodeType, levelOptions } from "./config";
 
 /**
  * @description:  计算普通节点偏移量
@@ -13,38 +13,36 @@ import { NodeType, levelOptions } from "./config"
  * @return {*}
  */
 export function nodeOffset(nodeConfig, flatDic) {
-    let maxLevel = getMaxLevel(flatDic)
-    let level = maxLevel - 1;
-    if ([NodeType.结束, NodeType.开始].includes(nodeConfig.type)) {
-        // 偏移懒得算 有需求可以自己加
-        switch (level) {
-            case 1:
-                return "190px";
-            case 2:
-                return "500px"
-            default:
-                return "0px";
-        }
+  let maxLevel = getMaxLevel(flatDic);
+  let level = maxLevel - 1;
+  if ([NodeType.结束, NodeType.开始].includes(nodeConfig.type)) {
+    // 偏移懒得算 有需求可以自己加
+    switch (level) {
+      case 1:
+        return "190px";
+      case 2:
+        return "500px";
+      default:
+        return "0px";
     }
-    if (level > 0) {
-        let node = flatDic[nodeConfig.fatherID]
-        while (node) {
-            if (node.type == NodeType.条件分支 && nodeConfig.level != 1) {
-                return "240px"
-            }
-            if (node.type == NodeType.条件) {
-                let childNode = nodeConfig.childNode && nodeConfig.childNode.type == NodeType.条件分支
-                return childNode ? "240px" : "0px"
-            }
-            node = flatDic[node.fatherID]
-        }
-        return "190px"
+  }
+  if (level > 0) {
+    let node = flatDic[nodeConfig.fatherID];
+    while (node) {
+      if (node.type == NodeType.条件分支 && nodeConfig.level != 1) {
+        return "240px";
+      }
+      if (node.type == NodeType.条件) {
+        let childNode = nodeConfig.childNode && nodeConfig.childNode.type == NodeType.条件分支;
+        return childNode ? "240px" : "0px";
+      }
+      node = flatDic[node.fatherID];
     }
+    return "190px";
+  }
 
-    return "0px";
+  return "0px";
 }
-
-
 
 /**
  * @description: 获取最大的层次等级
@@ -52,11 +50,11 @@ export function nodeOffset(nodeConfig, flatDic) {
  * @return {*}
  */
 export function getMaxLevel(flatDic) {
-    let maxLevel = 1;
-    for (let kv in flatDic) {
-        maxLevel = Math.max(maxLevel, flatDic[kv].level);
-    }
-    return maxLevel
+  let maxLevel = 1;
+  for (let kv in flatDic) {
+    maxLevel = Math.max(maxLevel, flatDic[kv].level);
+  }
+  return maxLevel;
 }
 
 /**
@@ -65,22 +63,22 @@ export function getMaxLevel(flatDic) {
  * @return {*}
  */
 export function carbonTextHandle(data, text) {
-    if (typeof (data) != "object") throw Error("无效数据类型")
-    for (let setting of data) {
-        let value = "抄送人："
-        switch (setting.type) {
-            case 0:
-                value += "直属主管"
-                break;
-            case 1:
-                value += levelOptions.find((x) => x.value == setting.level).label
-                break;
-            case 2:
-                value += setting.member.map((x) => x.name).toString()
-                break;
-        }
-        text.push(value)
+  if (typeof data != "object") throw Error("无效数据类型");
+  for (let setting of data) {
+    let value = "抄送人：";
+    switch (setting.type) {
+      case 0:
+        value += "直属主管";
+        break;
+      case 1:
+        value += levelOptions.find((x) => x.value == setting.level).label;
+        break;
+      case 2:
+        value += setting.member.map((x) => x.name).toString();
+        break;
     }
+    text.push(value);
+  }
 }
 
 /**
@@ -89,10 +87,10 @@ export function carbonTextHandle(data, text) {
  * @return {*}
  */
 export function carbonValidate(data) {
-    for (let setting of data) {
-        if (setting.type == 2 && setting.member.length == 0) {
-            return false
-        }
+  for (let setting of data) {
+    if (setting.type == 2 && setting.member.length == 0) {
+      return false;
     }
-    return true
+  }
+  return true;
 }
