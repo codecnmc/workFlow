@@ -1,6 +1,10 @@
 <template>
   <div class="nodeflow-components">
     <div class="flex">
+      <!-- @dragend.stop="drop"
+      :draggable="![$nodeType.开始,$nodeType.结束].includes(nodeConfig.type)"
+      @dragstart.stop="dragStart"
+      @dragenter.stop="dragEnter" -->
       <component
         :is="getComponent"
         :isTried.sync="isTried"
@@ -93,6 +97,7 @@ export default {
       let flatData = this.getFlatRoot();
       let father = flatData[flatData[this.dragID].fatherID];
       let hoverNode = flatData[this.hoverNode];
+
       if ([this.$nodeType.结束].includes(hoverNode.type)) {
         return clear();
       }
@@ -119,6 +124,7 @@ export default {
       if (e.target) {
         let isNode = false;
         let node = e.target;
+
         while (!isNode) {
           if (["node-wrap", "condition-node"].includes(node.className)) {
             let hoverID = node.getAttribute("data-id");
@@ -147,7 +153,6 @@ export default {
     },
     dragStart(e) {
       this.dragID = this.nodeConfig.nodeId;
-      console.log(this.nodeConfig);
       this.hoverNode = "";
     },
   },
